@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHRUMIL RANA // 3D_NEXUS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent: #00f0ff;
+            --glass: rgba(5, 5, 8, 0.65);
+            --border: rgba(0, 240, 255, 0.2);
+            --text-main: #ffffff;
+            --text-dim: #9aa0a6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Cyber Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); }
+        ::selection { background: var(--accent); color: #000; }
+
+        /* The 3D Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+        }
+
+        /* Content Overlay */
+        main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 3D Glass Cards */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 50px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            
+            /* Initial state for scroll animation */
+            opacity: 0;
+            transform: translateY(100px) translateZ(-100px) rotateX(-10deg);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel.visible {
+            opacity: 1;
+            transform: translateY(0) translateZ(0) rotateX(0);
+        }
+
+        .section-tag {
+            font-family: 'Space Mono', monospace;
+            color: var(--accent);
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        /* Hero Specific */
+        .hero-title {
+            font-size: 6rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: -3px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; line-height: 1.6; }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+        
+        .data-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 4px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .data-card:hover {
+            border-color: var(--accent);
+            background: rgba(0, 240, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .data-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+        .data-card p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 20px; }
+        .tech-tags span { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--accent); background: rgba(0, 240, 255, 0.1); padding: 4px 8px; margin-right: 8px; border-radius: 2px; display: inline-block; margin-bottom: 5px;}
+
+        /* Experience Timeline */
+        .exp-row {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+        .exp-row:hover { transform: translateX(10px); }
+        .exp-row:hover h4 { color: var(--accent); }
+        .exp-date { font-family: 'Space Mono'; color: var(--text-dim); font-size: 0.85rem; }
+        .exp-details h4 { font-size: 1.3rem; margin-bottom: 5px; transition: 0.3s; }
+        .exp-details h5 { font-family: 'Space Mono'; color: var(--accent); font-size: 0.85rem; margin-bottom: 10px; font-weight: normal; }
+        .exp-details p { color: var(--text-dim); font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3.5rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .exp-row { grid-template-columns: 1fr; gap: 5px; }
+            .glass-panel { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<main>
+    <section id="s1">
+        <div class="glass-panel observe-me">
+            <span class="section-tag">SYS_INIT // BOOT_SEQUENCE</span>
+            <h1 class="hero-title">Dhrumil Rana</h1>
+            <p class="hero-desc">AI Engineer & Data Scientist. Architecting autonomous multi-agent pipelines, massive-scale graph neural networks, and self-healing data ecosystems.</p>
+            <div style="margin-top: 30px; font-family: 'Space Mono'; font-size: 0.85rem;">
+                <i class="fa-solid fa-location-crosshairs" style="color: var(--accent); margin-right: 10px;"></i> MS DATA SCIENCE @ UT ARLINGTON
+            </div>
+        </div>
+    </section>
+
+    <section id="s2">
+        <div class="glass-panel observe-me">
+            <span class="section-tag">DATA_MODELS // REPOSITORIES</span>
+            <div class="grid-2">
+                <a href="https://github.com/dhrumilrana25/Agentic-Cleanse" target="_blank" class="data-card">
+                    <h3>Agentic-Cleanse Factory</h3>
+                    <p>Autonomous ETL pipeline with self-healing code execution and security logic loops.</p>
+                    <div class="tech-tags"><span>LANGGRAPH</span><span>GROQ API</span><span>MULTI-AGENT</span></div>
+                </a>
+                <a href="https://github.com/dhrumilrana25/Twitter-Scale-Link-Prediction-Engine" target="_blank" class="data-card">
+                    <h3>Twitter Link Prediction</h3>
+                    <p>Processed 1.2M nodes using DeepWalk embeddings to map and predict network topology.</p>
+                    <div class="tech-tags"><span>GRAPH_ML</span><span>DEEPWALK</span><span>NETWORKX</span></div>
+                </a>
+                <a href="https://github.com/dhrumilrana25/IoT-Malware-Detection-Network-Analytics" target="_blank" class="data-card" style="grid-column: 1 / -1;">
+                    <h3>IoT Malware Defense Analytics</h3>
+                    <p>Real-time behavioral threat detection across 1.1M connection instances. Engineered feature extraction resulting in 95.38% verified classification accuracy.</p>
+                    <div class="tech-tags"><span>CYBER_SEC</span><span>SCIKIT_LEARN</span><span>ANOMALY_DETECTION</span></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="s3">
+        <div class="glass-panel observe-me">
+            <span class="section-tag">LOG_HISTORY // PROFESSIONAL</span>
+            
+            <a href="https://www.novachat.io/" target="_blank" class="exp-row">
+                <div class="exp-date">APR 2026<br>PRESENT</div>
+                <div class="exp-details">
+                    <h4>NovaChatAI</h4>
+                    <h5>AI Engineer Intern</h5>
+                    <p>Architecting autonomous AI agent workflows and complex conversational logic leveraging LangGraph and LangChain.</p>
+                </div>
+            </a>
+
+            <a href="https://www.uta.edu/student-affairs/campus-recreation/facilities/mac" target="_blank" class="exp-row">
+                <div class="exp-date">MAR 2025<br>JUL 2026</div>
+                <div class="exp-details">
+                    <h4>Maverick Activities Center (UTA)</h4>
+                    <h5>Building Manager</h5>
+                    <p>Managing operational workflows, emergency response logistics, and facility security protocols.</p>
+                </div>
+            </a>
+
+            <a href="https://www.odoo.com" target="_blank" class="exp-row">
+                <div class="exp-date">JUN 2024<br>SEP 2024</div>
+                <div class="exp-details">
+                    <h4>Odoo</h4>
+                    <h5>Software Developer Intern</h5>
+                    <p>Engineered backend logic modules and optimized database architectures for global ERP integration.</p>
+                </div>
+            </a>
+
+            <a href="https://silentinfotech.com" target="_blank" class="exp-row" style="border: none;">
+                <div class="exp-date">JAN 2024<br>MAY 2024</div>
+                <div class="exp-details">
+                    <h4>Silent Infotech Pvt. Ltd.</h4>
+                    <h5>Research Analyst</h5>
+                    <p>Executed advanced data mining and statistical research to extract predictive insights from industry datasets.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    /* =========================================
+       1. 3D SCENE SETUP (THE DATA TUNNEL)
+       ========================================= */
+    const canvas = document.querySelector('#bg-canvas');
+    const scene = new THREE.Scene();
+    
+    // Add fog to make particles fade out in the distance
+    scene.fog = new THREE.FogExp2(0x000000, 0.002);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.set(0, 0, 0); // Start at origin
+
+    /* =========================================
+       2. GENERATING THE NEURAL DATA POINTS
+       ========================================= */
+    const particleCount = 4000;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const color1 = new THREE.Color(0x00f0ff); // Cyan
+    const color2 = new THREE.Color(0x0022ff); // Deep Blue
+
+    for(let i = 0; i < particleCount * 3; i+=3) {
+        // Create a massive "tunnel" of data points extending deep into the Z-axis
+        const radius = 20 + Math.random() * 80; // Keep middle relatively clear
+        const theta = Math.random() * Math.PI * 2;
+        
+        positions[i] = Math.cos(theta) * radius;     // x
+        positions[i+1] = Math.sin(theta) * radius;   // y
+        positions[i+2] = (Math.random() - 1) * 1500; // z (stretching deep into the background)
+
+        // Mix colors randomly between cyan and blue
+        const mixedColor = color1.clone().lerp(color2, Math.random());
+        colors[i] = mixedColor.r;
+        colors[i+1] = mixedColor.g;
+        colors[i+2] = mixedColor.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Create the material for the data nodes
+    const material = new THREE.PointsMaterial({
+        size: 0.8,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: true
+    });
+
+    const pointCloud = new THREE.Points(geometry, material);
+    scene.add(pointCloud);
+
+    /* =========================================
+       3. SCROLL -> CAMERA MOVEMENT MAPPING
+       ========================================= */
+    function moveCamera() {
+        const t = document.body.getBoundingClientRect().top;
+        
+        // As you scroll down (t becomes negative), the camera moves deeper into the Z-axis
+        camera.position.z = t * 0.2; 
+        
+        // Add a slight rotation to make it feel like you are spiraling through the data
+        camera.rotation.z = t * 0.0005;
+        camera.position.x = t * 0.005;
+    }
+
+    window.addEventListener('scroll', moveCamera);
+    moveCamera(); // Init
+
+    /* =========================================
+       4. ANIMATION RENDER LOOP
+       ========================================= */
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Slowly rotate the entire point cloud constantly for ambient movement
+        pointCloud.rotation.z += 0.0005;
+        
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    /* Handle Window Resize */
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+
+    /* =========================================
+       5. HTML GLASS CARD INTERSECTION OBSERVER
+       ========================================= */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            } else {
+                // Optional: remove class to animate out when scrolling past
+                entry.target.classList.remove('visible');
+            }
+        });
+    }, {
+        threshold: 0.15 // Triggers when 15% of the card is visible
+    });
+
+    const hiddenElements = document.querySelectorAll('.observe-me');
+    hiddenElements.forEach((el) => observer.observe(el));
+
+</script>
+</body>
+</html>

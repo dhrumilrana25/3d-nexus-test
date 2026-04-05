@@ -3,356 +3,541 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DHRUMIL RANA // 3D_NEXUS</title>
+    <title>DHRUMIL RANA // NEURAL_ARCHITECT.v15.0</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/neon/96/000000/processor.png">
     
     <style>
         :root {
+            --bg: #010101;
             --accent: #00f0ff;
-            --glass: rgba(5, 5, 8, 0.65);
+            --accent-glow: rgba(0, 240, 255, 0.4);
+            --glass: rgba(8, 8, 12, 0.75);
             --border: rgba(0, 240, 255, 0.2);
             --text-main: #ffffff;
-            --text-dim: #9aa0a6;
+            --text-dim: #8b8b9e;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
+
+        /* --- CUSTOM CYBER CURSORS --- */
+        html, body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="%2300f0ff"/><circle cx="12" cy="12" r="10" fill="none" stroke="%2300f0ff" stroke-width="1" opacity="0.6"/></svg>') 12 12, auto;
+        }
+        a, button, .magnetic {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="%23ffffff"/><circle cx="12" cy="12" r="11" fill="none" stroke="%23ffffff" stroke-width="1.5"/></svg>') 12 12, pointer !important;
+        }
+
+        /* --- CRT SCANLINE & VIGNETTE --- */
+        body::before {
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 9999; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9); z-index: 9998; pointer-events: none;
+        }
 
         body {
-            background-color: #000;
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+            background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif;
+            margin: 0; overflow-x: hidden; line-height: 1.6;
         }
 
-        /* Custom Cyber Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; box-shadow: 0 0 15px var(--accent); }
         ::selection { background: var(--accent); color: #000; }
 
-        /* The 3D Canvas Background */
-        #bg-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -1;
+        /* --- TOP PROGRESS BAR --- */
+        #top-progress-bar {
+            position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); width: 0%; z-index: 10000;
+            box-shadow: 0 0 15px var(--accent), 0 0 5px #fff; transition: width 0.1s ease-out;
         }
 
-        /* Content Overlay */
-        main {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-        }
+        #bg-matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.5; filter: contrast(1.2); }
 
-        section {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 100px 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+        .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
 
-        /* 3D Glass Cards */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 50px;
-            width: 100%;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-            
-            /* Initial state for scroll animation */
-            opacity: 0;
-            transform: translateY(100px) translateZ(-100px) rotateX(-10deg);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .glass-panel.visible {
-            opacity: 1;
-            transform: translateY(0) translateZ(0) rotateX(0);
-        }
-
-        .section-tag {
-            font-family: 'Space Mono', monospace;
-            color: var(--accent);
-            font-size: 0.9rem;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        /* Hero Specific */
-        .hero-title {
-            font-size: 6rem;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 20px;
-            letter-spacing: -3px;
-            background: linear-gradient(to right, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero-desc { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; line-height: 1.6; }
-
-        /* Grid Layouts */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+        /* --- ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(50px) scale(0.98); transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0) scale(1); }
         
-        .data-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 4px;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .cursor-blink { display: inline-block; width: 10px; height: 1em; background-color: var(--accent); animation: blink 1s step-end infinite; vertical-align: bottom; margin-left: 5px;}
+
+        /* --- NAVIGATION --- */
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 100px; }
+        .logo { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); letter-spacing: 4px; text-shadow: 0 0 15px var(--accent-glow); }
+        .social-links a { color: var(--text-main); font-size: 1.3rem; margin-left: 30px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; }
+        .social-links a:hover { color: var(--accent); transform: scale(1.3) rotate(5deg); text-shadow: 0 0 20px var(--accent); }
+
+        /* --- HERO --- */
+        header { text-align: center; margin-bottom: 140px; border-bottom: 1px solid rgba(0,240,255,0.1); padding-bottom: 80px; position: relative; }
+        header::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 100px; height: 2px; background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        
+        .subtitle { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; letter-spacing: 8px; margin-bottom: 25px; text-transform: uppercase; font-weight: 700;}
+        h1 { font-size: 5.5rem; font-weight: 600; margin: 0; color: #ffffff; letter-spacing: -4px; line-height: 1.1; }
+        .bio { max-width: 700px; font-size: 1.2rem; color: var(--text-dim); margin: 35px auto; font-weight: 300; }
+        
+        .btn-glow {
+            display: inline-block; margin-top: 10px; padding: 16px 40px; border: 1px solid var(--accent);
+            color: #ffffff; text-decoration: none; font-family: 'Space Mono'; font-size: 0.9rem; font-weight: 700;
+            background: rgba(0, 240, 255, 0.05); backdrop-filter: blur(5px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden; letter-spacing: 2px;
+        }
+        .btn-glow:hover { background: var(--accent); color: #000; box-shadow: 0 0 40px var(--accent-glow); transform: scale(1.05); }
+
+        .section-label { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--accent); margin-bottom: 60px; display: flex; align-items: center; gap: 20px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;}
+        .section-label::after { content: ''; height: 1px; flex-grow: 1; background: linear-gradient(90deg, var(--border), transparent); }
+
+        /* --- PROJECT CARDS --- */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; margin-bottom: 160px; }
+        
+        .project-card {
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--border); border-radius: 8px;
+            padding: 40px 30px 30px; transition: 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden;
+        }
+
+        .project-card::before {
+            content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg); transition: 0.7s; z-index: 1; pointer-events: none;
+        }
+        .project-card:hover::before { left: 150%; }
+
+        .project-card:hover { 
+            border-top-color: var(--accent); border-color: var(--border); 
+            transform: translateY(-12px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0,240,255,0.05); 
+            background: rgba(15, 15, 20, 0.85);
+        }
+
+        .project-info { position: relative; z-index: 2; flex-grow: 1; }
+        .project-card h3 { margin: 0; color: #ffffff; font-size: 1.5rem; letter-spacing: -0.5px; }
+        .project-card p { color: var(--text-dim); font-size: 0.95rem; margin-top: 15px; line-height: 1.7; }
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; font-family: 'Space Mono'; font-size: 0.7rem; color: var(--accent); }
+        .tech-tags span { background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0,240,255,0.1); padding: 4px 10px; border-radius: 4px; }
+
+        /* Action Bar for Projects */
+        .card-actions { display: flex; gap: 15px; margin-top: 35px; position: relative; z-index: 2; }
+        .action-btn { 
+            flex: 1; text-align: center; padding: 10px 0; border: 1px solid rgba(255,255,255,0.1); 
+            color: #fff; text-decoration: none; font-family: 'Space Mono'; font-size: 0.75rem; 
+            border-radius: 4px; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.02);
+        }
+        .action-btn:hover { background: #fff; color: #000; }
+        
+        .action-demo { 
+            border-color: var(--accent); color: var(--accent); background: rgba(0,240,255,0.05); 
+            animation: pulse-border 2s infinite; 
+        }
+        .action-demo:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); animation: none;}
+
+        /* --- SKILL MATRIX --- */
+        .skill-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; margin-bottom: 160px; perspective: 1000px; }
+        .skill-box { 
+            padding: 35px 25px; background: var(--glass); border: 1px solid rgba(255,255,255,0.05); 
+            border-left: 3px solid var(--accent); border-radius: 4px;
+            transform-style: preserve-3d; transition: transform 0.2s ease-out; 
+            /* Floating Animation */
+            animation: float 6s ease-in-out infinite;
         }
         
-        .data-card:hover {
-            border-color: var(--accent);
-            background: rgba(0, 240, 255, 0.05);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1);
+        /* Stagger the floating */
+        .skill-box:nth-child(1) { animation-delay: 0s; }
+        .skill-box:nth-child(2) { animation-delay: -1.5s; }
+        .skill-box:nth-child(3) { animation-delay: -3s; }
+        .skill-box:nth-child(4) { animation-delay: -4.5s; }
+
+        .skill-box h4 { font-family: 'Space Mono'; color: #ffffff; font-size: 0.95rem; margin: 0 0 20px 0; letter-spacing: 1px; transform: translateZ(30px); }
+        .skill-box ul { list-style: none; padding: 0; margin: 0; color: var(--text-dim); font-size: 0.9rem; transform: translateZ(20px); }
+        .skill-box li { margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+        .skill-box li::before { content: "►"; color: var(--accent); font-size: 0.6rem; opacity: 0.7; }
+
+        /* --- SCROLL TIMELINE --- */
+        .timeline-container { position: relative; padding-left: 50px; margin-bottom: 140px; }
+        .timeline-container::before { content: ''; position: absolute; top: 0; left: 15px; width: 2px; height: 100%; background: rgba(255,255,255,0.05); }
+        
+        .timeline-progress { position: absolute; top: 0; left: 15px; width: 2px; height: 0%; background: var(--accent); box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent); z-index: 1; }
+        .timeline-block { position: relative; margin-bottom: 50px; }
+        
+        .timeline-node { position: absolute; top: 40px; left: -41px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid rgba(255,255,255,0.2); z-index: 2; transition: 0.4s ease; }
+        .timeline-block.active .timeline-node { background: var(--accent); border-color: #fff; box-shadow: 0 0 20px var(--accent); transform: scale(1.4); }
+
+        .experience-card { display: flex; justify-content: space-between; align-items: center; padding: 35px 30px; background: var(--glass); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; text-decoration: none; color: inherit; transition: 0.4s; gap: 25px; position: relative; overflow: hidden; }
+        .experience-card::after { content:''; position: absolute; top:0; left:0; width: 2px; height: 100%; background: var(--accent); transform: scaleY(0); transition: 0.4s; transform-origin: bottom; }
+        .experience-card:hover { transform: translateX(15px); box-shadow: 0 15px 40px rgba(0,0,0,0.5); background: rgba(15,15,20,0.9); border-color: rgba(255,255,255,0.1); }
+        .experience-card:hover::after { transform: scaleY(1); }
+        .timeline-block.active .experience-card { border-left: 1px solid var(--accent); }
+
+        /* UNIFORM CSS BADGES */
+        .css-badge {
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0,240,255,0.2); color: var(--accent);
+            font-family: 'Space Mono', monospace; font-weight: 900; font-size: 1.6rem; letter-spacing: -1px;
+            border-radius: 8px; box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+            width: 75px; height: 75px; flex-shrink: 0; transition: 0.4s ease;
         }
+        .experience-card:hover .css-badge { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent); }
 
-        .data-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
-        .data-card p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 20px; }
-        .tech-tags span { font-family: 'Space Mono'; font-size: 0.7rem; color: var(--accent); background: rgba(0, 240, 255, 0.1); padding: 4px 8px; margin-right: 8px; border-radius: 2px; display: inline-block; margin-bottom: 5px;}
+        .exp-main { flex-grow: 1; }
+        .exp-main h4 { margin: 0; color: #ffffff; font-size: 1.35rem; letter-spacing: -0.5px; }
+        .exp-main h5 { margin: 6px 0 12px 0; font-family: 'Space Mono'; color: var(--accent); font-size: 0.85rem; font-weight: normal; }
+        .exp-main p { margin: 0; color: var(--text-dim); font-size: 0.95rem; max-width: 650px; }
+        .exp-meta { font-family: 'Space Mono'; color: rgba(255,255,255,0.4); font-size: 0.85rem; text-align: right; min-width: 140px; }
 
-        /* Experience Timeline */
-        .exp-row {
-            display: grid;
-            grid-template-columns: 1fr 3fr;
-            gap: 20px;
-            padding: 30px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            text-decoration: none;
-            color: inherit;
-            transition: 0.3s;
-        }
-        .exp-row:hover { transform: translateX(10px); }
-        .exp-row:hover h4 { color: var(--accent); }
-        .exp-date { font-family: 'Space Mono'; color: var(--text-dim); font-size: 0.85rem; }
-        .exp-details h4 { font-size: 1.3rem; margin-bottom: 5px; transition: 0.3s; }
-        .exp-details h5 { font-family: 'Space Mono'; color: var(--accent); font-size: 0.85rem; margin-bottom: 10px; font-weight: normal; }
-        .exp-details p { color: var(--text-dim); font-size: 0.95rem; }
+        footer { text-align: center; padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.05); font-family: 'Space Mono'; color: rgba(255,255,255,0.3); font-size: 0.75rem; letter-spacing: 2px; }
 
-        @media (max-width: 768px) {
-            .hero-title { font-size: 3.5rem; }
-            .grid-2 { grid-template-columns: 1fr; }
-            .exp-row { grid-template-columns: 1fr; gap: 5px; }
-            .glass-panel { padding: 30px 20px; }
+        @media (max-width: 900px) {
+            h1 { font-size: 3.5rem; }
+            .timeline-container { padding-left: 20px; }
+            .timeline-container::before, .timeline-progress { left: 5px; }
+            .timeline-node { left: -19px; }
+            .experience-card { flex-direction: column; text-align: left; align-items: flex-start; gap: 15px; }
+            .exp-meta { text-align: left; }
         }
     </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+<div id="top-progress-bar"></div>
+<canvas id="bg-matrix"></canvas>
 
-<main>
-    <section id="s1">
-        <div class="glass-panel observe-me">
-            <span class="section-tag">SYS_INIT // BOOT_SEQUENCE</span>
-            <h1 class="hero-title">Dhrumil Rana</h1>
-            <p class="hero-desc">AI Engineer & Data Scientist. Architecting autonomous multi-agent pipelines, massive-scale graph neural networks, and self-healing data ecosystems.</p>
-            <div style="margin-top: 30px; font-family: 'Space Mono'; font-size: 0.85rem;">
-                <i class="fa-solid fa-location-crosshairs" style="color: var(--accent); margin-right: 10px;"></i> MS DATA SCIENCE @ UT ARLINGTON
+<div class="container">
+    <nav>
+        <div class="logo">DHRUMIL_RANA.v15</div>
+        <div class="social-links">
+            <a href="https://github.com/dhrumilrana25" target="_blank" class="magnetic"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/dhrumil-rana-265316232/" target="_blank" class="magnetic"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+    </nav>
+
+    <header class="reveal">
+        <div class="subtitle">AI ENGINEER & DATA SCIENTIST</div>
+        <h1><span id="typewriter"></span><span class="cursor-blink"></span></h1>
+        <p class="bio">MS Data Science @ UTA. Specialized in autonomous AI orchestration, graph neural networks, and behavioral malware detection. Architecting the logic for self-healing software ecosystems.</p>
+        <a href="Dhrumil_Rana_Resume.pdf" target="_blank" class="btn-glow magnetic">[ DOWNLOAD_RESUME ]</a>
+    </header>
+
+    <div class="section-label reveal">01 // PROJECT_REPOS</div>
+    <div class="project-grid">
+        
+        <div class="project-card reveal">
+            <div class="project-info">
+                <h3>Agentic-Cleanse Factory</h3>
+                <p>Multi-agent ETL pipeline with self-healing code loops and security critics. Built with LangGraph & Groq to fully automate data sanitation.</p>
+                <div class="tech-tags"><span>AGENTIC_AI</span> <span>LANGGRAPH</span> <span>STREAMLIT</span></div>
+            </div>
+            <div class="card-actions">
+                <a href="https://github.com/dhrumilrana25/Agentic-Cleanse" target="_blank" class="action-btn">
+                    <i class="fa-brands fa-github"></i> REPO
+                </a>
+                <a href="https://dhrumil-cleanse.streamlit.app/" target="_blank" class="action-btn action-demo">
+                    <i class="fa-solid fa-bolt"></i> LIVE_DEMO
+                </a>
             </div>
         </div>
-    </section>
 
-    <section id="s2">
-        <div class="glass-panel observe-me">
-            <span class="section-tag">DATA_MODELS // REPOSITORIES</span>
-            <div class="grid-2">
-                <a href="https://github.com/dhrumilrana25/Agentic-Cleanse" target="_blank" class="data-card">
-                    <h3>Agentic-Cleanse Factory</h3>
-                    <p>Autonomous ETL pipeline with self-healing code execution and security logic loops.</p>
-                    <div class="tech-tags"><span>LANGGRAPH</span><span>GROQ API</span><span>MULTI-AGENT</span></div>
-                </a>
-                <a href="https://github.com/dhrumilrana25/Twitter-Scale-Link-Prediction-Engine" target="_blank" class="data-card">
-                    <h3>Twitter Link Prediction</h3>
-                    <p>Processed 1.2M nodes using DeepWalk embeddings to map and predict network topology.</p>
-                    <div class="tech-tags"><span>GRAPH_ML</span><span>DEEPWALK</span><span>NETWORKX</span></div>
-                </a>
-                <a href="https://github.com/dhrumilrana25/IoT-Malware-Detection-Network-Analytics" target="_blank" class="data-card" style="grid-column: 1 / -1;">
-                    <h3>IoT Malware Defense Analytics</h3>
-                    <p>Real-time behavioral threat detection across 1.1M connection instances. Engineered feature extraction resulting in 95.38% verified classification accuracy.</p>
-                    <div class="tech-tags"><span>CYBER_SEC</span><span>SCIKIT_LEARN</span><span>ANOMALY_DETECTION</span></div>
+        <div class="project-card reveal" style="transition-delay: 0.1s;">
+            <div class="project-info">
+                <h3>Twitter Link Prediction</h3>
+                <p>Social discovery engine processing 1.2M nodes using DeepWalk embeddings and advanced graph heuristics to map network topology.</p>
+                <div class="tech-tags"><span>GRAPH_ML</span> <span>DEEPWALK</span> <span>NETWORKX</span></div>
+            </div>
+            <div class="card-actions">
+                <a href="https://github.com/dhrumilrana25/Twitter-Scale-Link-Prediction-Engine" target="_blank" class="action-btn">
+                    <i class="fa-brands fa-github"></i> VIEW_REPOSITORY
                 </a>
             </div>
         </div>
-    </section>
 
-    <section id="s3">
-        <div class="glass-panel observe-me">
-            <span class="section-tag">LOG_HISTORY // PROFESSIONAL</span>
-            
-            <a href="https://www.novachat.io/" target="_blank" class="exp-row">
-                <div class="exp-date">APR 2026<br>PRESENT</div>
-                <div class="exp-details">
+        <div class="project-card reveal" style="transition-delay: 0.2s;">
+            <div class="project-info">
+                <h3>IoT Malware Defense</h3>
+                <p>Real-time behavioral analytics for IoT security protocols. Engineered feature extraction resulting in a verified 95.38% classification accuracy.</p>
+                <div class="tech-tags"><span>CYBER_SEC</span> <span>ML_ANALYTICS</span> <span>ANOMALY</span></div>
+            </div>
+            <div class="card-actions">
+                <a href="https://github.com/dhrumilrana25/IoT-Malware-Detection-Network-Analytics" target="_blank" class="action-btn">
+                    <i class="fa-brands fa-github"></i> VIEW_REPOSITORY
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-label reveal">02 // NEURAL_SKILLS</div>
+    <div class="skill-matrix reveal">
+        <div class="skill-box tilt-card magnetic-box">
+            <h4>ORCHESTRATION</h4>
+            <ul><li>LangGraph</li><li>Agentic AI</li><li>LangSmith</li></ul>
+        </div>
+        <div class="skill-box tilt-card magnetic-box">
+            <h4>LLM / NLP</h4>
+            <ul><li>Llama 3.3</li><li>Prompt Engineering</li><li>Groq API</li></ul>
+        </div>
+        <div class="skill-box tilt-card magnetic-box">
+            <h4>GRAPH / DATA</h4>
+            <ul><li>NetworkX</li><li>DeepWalk</li><li>Pandas</li></ul>
+        </div>
+        <div class="skill-box tilt-card magnetic-box">
+            <h4>CORE LOGIC</h4>
+            <ul><li>Python</li><li>Streamlit</li><li>SQL</li></ul>
+        </div>
+    </div>
+
+    <div class="section-label reveal">03 // PROFESSIONAL_TIMELINE</div>
+    <div class="timeline-container" id="timeline">
+        <div class="timeline-progress" id="timeline-progress"></div>
+
+        <div class="timeline-block reveal">
+            <div class="timeline-node"></div>
+            <a href="https://www.novachat.io/" target="_blank" class="experience-card">
+                <div class="css-badge">NC</div>
+                <div class="exp-main">
                     <h4>NovaChatAI</h4>
                     <h5>AI Engineer Intern</h5>
                     <p>Architecting autonomous AI agent workflows and complex conversational logic leveraging LangGraph and LangChain.</p>
                 </div>
+                <div class="exp-meta">APR 2026 - PRES</div>
             </a>
+        </div>
 
-            <a href="https://www.uta.edu/student-affairs/campus-recreation/facilities/mac" target="_blank" class="exp-row">
-                <div class="exp-date">MAR 2025<br>JUL 2026</div>
-                <div class="exp-details">
+        <div class="timeline-block reveal" style="transition-delay: 0.1s;">
+            <div class="timeline-node"></div>
+            <a href="https://www.uta.edu/student-affairs/campus-recreation/facilities/mac" target="_blank" class="experience-card">
+                <div class="css-badge">MC</div>
+                <div class="exp-main">
                     <h4>Maverick Activities Center (UTA)</h4>
-                    <h5>Building Manager</h5>
+                    <h5>Building Manager // Systems & Ops</h5>
                     <p>Managing operational workflows, emergency response logistics, and facility security protocols.</p>
                 </div>
+                <div class="exp-meta">MAR 2025 - JUL 2026</div>
             </a>
+        </div>
 
-            <a href="https://www.odoo.com" target="_blank" class="exp-row">
-                <div class="exp-date">JUN 2024<br>SEP 2024</div>
-                <div class="exp-details">
+        <div class="timeline-block reveal" style="transition-delay: 0.2s;">
+            <div class="timeline-node"></div>
+            <a href="https://www.odoo.com" target="_blank" class="experience-card">
+                <div class="css-badge">OD</div>
+                <div class="exp-main">
                     <h4>Odoo</h4>
                     <h5>Software Developer Intern</h5>
                     <p>Engineered backend logic modules and optimized database architectures for global ERP integration.</p>
                 </div>
+                <div class="exp-meta">JUN 2024 - SEP 2024</div>
             </a>
+        </div>
 
-            <a href="https://silentinfotech.com" target="_blank" class="exp-row" style="border: none;">
-                <div class="exp-date">JAN 2024<br>MAY 2024</div>
-                <div class="exp-details">
+        <div class="timeline-block reveal" style="transition-delay: 0.3s;">
+            <div class="timeline-node"></div>
+            <a href="https://silentinfotech.com" target="_blank" class="experience-card">
+                <div class="css-badge">SI</div>
+                <div class="exp-main">
                     <h4>Silent Infotech Pvt. Ltd.</h4>
                     <h5>Research Analyst</h5>
                     <p>Executed advanced data mining and statistical research to extract predictive insights from industry datasets.</p>
                 </div>
+                <div class="exp-meta">JAN 2024 - MAY 2024</div>
             </a>
         </div>
-    </section>
-</main>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <footer>[ SYSTEM_STABLE ] // &copy; 2026 DHRUMIL RANA // BUILT_FOR_SCALABILITY</footer>
+</div>
+
 <script>
-    /* =========================================
-       1. 3D SCENE SETUP (THE DATA TUNNEL)
-       ========================================= */
-    const canvas = document.querySelector('#bg-canvas');
-    const scene = new THREE.Scene();
-    
-    // Add fog to make particles fade out in the distance
-    scene.fog = new THREE.FogExp2(0x000000, 0.002);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.position.set(0, 0, 0); // Start at origin
-
-    /* =========================================
-       2. GENERATING THE NEURAL DATA POINTS
-       ========================================= */
-    const particleCount = 4000;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-
-    const color1 = new THREE.Color(0x00f0ff); // Cyan
-    const color2 = new THREE.Color(0x0022ff); // Deep Blue
-
-    for(let i = 0; i < particleCount * 3; i+=3) {
-        // Create a massive "tunnel" of data points extending deep into the Z-axis
-        const radius = 20 + Math.random() * 80; // Keep middle relatively clear
-        const theta = Math.random() * Math.PI * 2;
-        
-        positions[i] = Math.cos(theta) * radius;     // x
-        positions[i+1] = Math.sin(theta) * radius;   // y
-        positions[i+2] = (Math.random() - 1) * 1500; // z (stretching deep into the background)
-
-        // Mix colors randomly between cyan and blue
-        const mixedColor = color1.clone().lerp(color2, Math.random());
-        colors[i] = mixedColor.r;
-        colors[i+1] = mixedColor.g;
-        colors[i+2] = mixedColor.b;
+    /* --- Advanced Typewriter --- */
+    const text = "Dhrumil Rana"; let i = 0;
+    function typeWriter() {
+        if (i < text.length) {
+            document.getElementById("typewriter").innerHTML += text.charAt(i);
+            i++; setTimeout(typeWriter, 120 + Math.random() * 50); // Added random delay for realism
+        }
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    // Create the material for the data nodes
-    const material = new THREE.PointsMaterial({
-        size: 0.8,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.8,
-        sizeAttenuation: true
-    });
-
-    const pointCloud = new THREE.Points(geometry, material);
-    scene.add(pointCloud);
-
-    /* =========================================
-       3. SCROLL -> CAMERA MOVEMENT MAPPING
-       ========================================= */
-    function moveCamera() {
-        const t = document.body.getBoundingClientRect().top;
+    /* --- Scroll Logic (Reveal, Timeline, Top Progress) --- */
+    function handleScroll() {
+        var reveals = document.querySelectorAll(".reveal");
+        var windowHeight = window.innerHeight;
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
         
-        // As you scroll down (t becomes negative), the camera moves deeper into the Z-axis
-        camera.position.z = t * 0.2; 
-        
-        // Add a slight rotation to make it feel like you are spiraling through the data
-        camera.rotation.z = t * 0.0005;
-        camera.position.x = t * 0.005;
+        // 1. Top Progress
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollPercent = (scrollTop / scrollHeight) * 100;
+        document.getElementById('top-progress-bar').style.width = scrollPercent + '%';
+
+        // 2. Staggered Element Reveals
+        for (var i = 0; i < reveals.length; i++) {
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            if (elementTop < windowHeight - 50) reveals[i].classList.add("active");
+        }
+
+        // 3. Timeline Tracker
+        const timeline = document.getElementById('timeline');
+        const progress = document.getElementById('timeline-progress');
+        const blocks = document.querySelectorAll('.timeline-block');
+
+        if(timeline && progress) {
+            const rect = timeline.getBoundingClientRect();
+            const scrolled = (windowHeight * 0.85) - rect.top;
+            let scrollPercentage = (scrolled / rect.height) * 100;
+            scrollPercentage = Math.max(0, Math.min(100, scrollPercentage));
+            progress.style.height = scrollPercentage + '%';
+
+            blocks.forEach(block => {
+                const blockRect = block.getBoundingClientRect();
+                if (blockRect.top < (windowHeight * 0.85)) {
+                    block.classList.add('active');
+                } else {
+                    block.classList.remove('active');
+                }
+            });
+        }
     }
 
-    window.addEventListener('scroll', moveCamera);
-    moveCamera(); // Init
+    window.addEventListener("scroll", handleScroll);
 
-    /* =========================================
-       4. ANIMATION RENDER LOOP
-       ========================================= */
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        // Slowly rotate the entire point cloud constantly for ambient movement
-        pointCloud.rotation.z += 0.0005;
-        
-        renderer.render(scene, camera);
-    }
-    animate();
+    /* --- Magnetic Physics for Buttons & Cards --- */
+    const magnetics = document.querySelectorAll('.magnetic, .magnetic-box');
+    magnetics.forEach(btn => {
+        btn.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const h = rect.width / 2;
+            const w = rect.height / 2;
+            const x = e.clientX - rect.left - h;
+            const y = e.clientY - rect.top - w;
+            
+            // Smaller movement for larger boxes, larger for small buttons
+            const multiplier = this.classList.contains('magnetic-box') ? 0.05 : 0.3;
+            this.style.transform = `translate(${x * multiplier}px, ${y * multiplier}px)`;
+        });
 
-    /* Handle Window Resize */
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-    });
-
-    /* =========================================
-       5. HTML GLASS CARD INTERSECTION OBSERVER
-       ========================================= */
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            } else {
-                // Optional: remove class to animate out when scrolling past
-                entry.target.classList.remove('visible');
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = `translate(0px, 0px)`;
+            // If it's also a tilt card, reset that too
+            if(this.classList.contains('tilt-card')) {
+                this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
             }
         });
-    }, {
-        threshold: 0.15 // Triggers when 15% of the card is visible
     });
 
-    const hiddenElements = document.querySelectorAll('.observe-me');
-    hiddenElements.forEach((el) => observer.observe(el));
+    /* --- 3D Tilt Effect for Skills --- */
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -15; // Increased tilt
+            const rotateY = ((x - centerX) / centerX) * 15;
+            
+            // Combine with magnetic translate if active
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            card.style.borderColor = "var(--accent)";
+            card.style.boxShadow = "0 15px 35px rgba(0,240,255,0.15)";
+        });
 
+        card.addEventListener('mouseleave', () => {
+            card.style.borderColor = "rgba(255,255,255,0.05)";
+            card.style.boxShadow = "none";
+        });
+    });
+
+    /* --- Ganesha Matrix Logic (Optimized) --- */
+    const canvas = document.getElementById('bg-matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+    const shapeCanvas = document.createElement('canvas');
+    const sCtx = shapeCanvas.getContext('2d');
+    shapeCanvas.width = canvas.width; shapeCanvas.height = canvas.height;
+
+    function drawGaneshaShape() {
+        sCtx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+        sCtx.fillStyle = "white";
+        const cx = shapeCanvas.width / 2; const cy = shapeCanvas.height / 2;
+        const scale = Math.min(canvas.width, canvas.height) / 1000;
+
+        sCtx.beginPath();
+        sCtx.arc(cx, cy - 100 * scale, 80 * scale, 0, Math.PI * 2); 
+        sCtx.moveTo(cx - 100 * scale, cy - 150 * scale);
+        sCtx.quadraticCurveTo(cx - 250 * scale, cy - 100 * scale, cx - 100 * scale, cy + 50 * scale); 
+        sCtx.moveTo(cx + 100 * scale, cy - 150 * scale);
+        sCtx.quadraticCurveTo(cx + 250 * scale, cy - 100 * scale, cx + 100 * scale, cy + 50 * scale); 
+        sCtx.moveTo(cx, cy - 50 * scale);
+        sCtx.bezierCurveTo(cx - 20 * scale, cy + 150 * scale, cx + 150 * scale, cy + 180 * scale, cx + 80 * scale, cy + 250 * scale);
+        sCtx.lineWidth = 40 * scale; sCtx.stroke(); sCtx.fill();
+    }
+
+    const chars = "01ΣΔॐpd.read_csv∫model.predict0101λμ".split("");
+    const fontSize = 16;
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = Math.random() * -100;
+
+    function drawMatrix() {
+        ctx.fillStyle = "rgba(1, 1, 1, 0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const shapeData = sCtx.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height).data;
+
+        for (let i = 0; i < drops.length; i++) {
+            const x = Math.floor(i * fontSize);
+            const y = Math.floor(drops[i] * fontSize);
+            if(y < 0) { drops[i]++; continue; } 
+
+            const pixelIndex = (y * shapeCanvas.width + x) * 4;
+            const isInside = pixelIndex < shapeData.length && shapeData[pixelIndex] > 0;
+
+            // Adding a slight glow effect to matrix characters
+            ctx.shadowBlur = isInside ? 5 : 0;
+            ctx.shadowColor = "#00f0ff";
+            
+            ctx.fillStyle = isInside ? "#00f0ff" : "rgba(0, 240, 255, 0.15)";
+            ctx.font = isInside ? "bold " + fontSize + "px Space Mono" : fontSize + "px Space Mono";
+            const txt = isInside ? "ॐ" : chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(txt, x, y);
+            
+            ctx.shadowBlur = 0; // Reset for performance
+
+            if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        shapeCanvas.width = canvas.width; shapeCanvas.height = canvas.height;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = [];
+        for (let x = 0; x < columns; x++) drops[x] = Math.random() * -100;
+        drawGaneshaShape();
+    });
+
+    window.onload = () => { 
+        drawGaneshaShape(); typeWriter(); handleScroll(); 
+        setInterval(drawMatrix, 50); 
+    };
 </script>
 </body>
 </html>

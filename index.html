@@ -162,6 +162,8 @@
                     <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div></div>
                     <div class="parallax-wrap" data-speed="-0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div></div>
                     <div class="parallax-wrap" data-speed="0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic5.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic6.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -176,6 +178,7 @@
                     <div class="parallax-wrap" data-speed="0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div></div>
                     <div class="parallax-wrap" data-speed="-1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div></div>
                     <div class="parallax-wrap" data-speed="1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic4.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -414,7 +417,26 @@
             audioBtn.classList.add('visible');
             bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
             gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
+            
+            // Trigger ambient floating for frames right after load
+            initAmbientFloat();
         });
+
+        // Ambient breathing float for all frames
+        function initAmbientFloat() {
+            gsap.utils.toArray('.frame').forEach(frame => {
+                gsap.to(frame, {
+                    y: `+=${Math.random() * 12 - 6}`,
+                    x: `+=${Math.random() * 8 - 4}`,
+                    rotationZ: Math.random() * 2 - 1,
+                    duration: Math.random() * 2 + 3,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: "sine.inOut",
+                    delay: Math.random() * 2
+                });
+            });
+        }
 
         // 3D Glass Scroll Animation
         const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });

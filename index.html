@@ -19,7 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
-        /* --- GOD TIER VARIABLES --- */
         :root {
             --uta-blue: #0064B1;
             --uta-glow: rgba(0, 100, 177, 0.9);
@@ -35,114 +34,81 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); }
 
-        /* --- UI UPGRADES --- */
-        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--uta-blue); width: 0%; z-index: 10001; box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--white); width: 0%; z-index: 10001; box-shadow: 0 0 15px var(--white); pointer-events: none; transition: background 0.5s; }
         
-        #audio-toggle {
-            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            z-index: 10000; backdrop-filter: blur(10px); transition: all 0.3s ease; opacity: 0; pointer-events: none;
-        }
+        #audio-toggle { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(10px); transition: all 0.3s ease; opacity: 0; pointer-events: none; }
         #audio-toggle.visible { opacity: 1; pointer-events: all; }
-        #audio-toggle:hover { border-color: var(--uta-blue); box-shadow: 0 0 20px var(--uta-glow); transform: scale(1.1); }
+        #audio-toggle:hover { border-color: var(--white); box-shadow: 0 0 20px rgba(255,255,255,0.5); transform: scale(1.1); }
         #audio-toggle svg { width: 20px; height: 20px; fill: var(--white); transition: 0.3s; }
         #audio-toggle.muted svg { fill: #888; }
 
-        /* --- LIQUID CURSOR --- */
         #cursor { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.2s; }
-        #cursor-trail { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--uta-blue); box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.1s ease-out; }
+        #cursor-trail { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--white); box-shadow: 0 0 15px rgba(255,255,255,0.5); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.1s ease-out; }
         @media (pointer: coarse) { * { cursor: auto !important; } #cursor, #cursor-trail { display: none !important; } }
 
-        /* --- VAULT PRELOADER --- */
         #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; perspective: 1000px; }
-        .core { width: 60px; height: 60px; border: 2px solid var(--uta-blue); transform: rotate(45deg); animation: pulse-core 2s infinite ease-in-out; margin-bottom: 40px; box-shadow: 0 0 30px var(--uta-glow); }
+        .core { width: 60px; height: 60px; border: 2px solid var(--uta-blue); transform: rotate(45deg); animation: pulse-core 2s infinite ease-in-out; margin-bottom: 40px; box-shadow: 0 0 30px var(--uta-glow); transition: border-color 1s; }
         @keyframes pulse-core { 0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.8; } 50% { transform: rotate(45deg) scale(1.2); opacity: 1; box-shadow: 0 0 50px var(--uta-glow), inset 0 0 20px var(--uta-glow); } }
         
         #load-text { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 12px; color: #888; margin-bottom: 30px; text-transform: uppercase; text-align: center; }
         #enter-btn { padding: 15px 60px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 5px; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.5s; pointer-events: none; text-transform: uppercase; }
-        #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; border-color: var(--uta-blue); }
-        #enter-btn.ready:hover { background: rgba(0, 100, 177, 0.2); box-shadow: 0 0 40px var(--uta-glow) inset, 0 0 20px var(--uta-glow); }
+        #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; border-color: var(--white); }
+        #enter-btn.ready:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 40px rgba(255,255,255,0.3) inset, 0 0 20px rgba(255,255,255,0.3); }
 
-        /* --- 3D CANVAS --- */
         #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
 
-        /* --- MASTER LAYOUT --- */
         main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
         .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
 
         .hero { justify-content: center; text-align: center; height: 100vh; flex-direction: column; }
-        .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 7.5rem); letter-spacing: 6px; line-height: 1.1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 7.5rem); letter-spacing: 6px; line-height: 1.1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; transition: text-shadow 1s; }
         .hero h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 200; font-style: italic; letter-spacing: 4px; color: #ccc; }
         .scroll-down { position: absolute; bottom: 5vh; font-size: 0.8rem; letter-spacing: 8px; animation: pulse-text 2s infinite; opacity: 0.4; }
         @keyframes pulse-text { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; text-shadow: 0 0 10px var(--white); } }
 
-        /* --- CHAPTER ARCHITECTURE --- */
-        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 8vh; z-index: 2; align-items: center; }
+        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 6vh; z-index: 2; align-items: center; }
         
         .poem-block {
-            max-width: 850px; width: 100%; background: rgba(8, 8, 12, 0.4);
+            max-width: 850px; width: 100%; background: rgba(8, 8, 12, 0.5);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: clamp(40px, 6vw, 60px) clamp(20px, 5vw, 60px); 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-            text-align: center; border-radius: 4px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8); text-align: center; border-radius: 4px; transition: border-color 1s, box-shadow 1s;
         }
         
-        .chap-num { font-size: 1rem; letter-spacing: 8px; color: var(--uta-blue); display: block; margin-bottom: 15px; font-weight: 600; font-family: 'Montserrat', sans-serif; text-shadow: 0 0 10px rgba(0, 100, 177, 0.5); }
+        .chap-num { font-size: 1rem; letter-spacing: 8px; color: var(--white); display: block; margin-bottom: 15px; font-weight: 600; font-family: 'Montserrat', sans-serif; text-shadow: 0 0 10px rgba(255,255,255,0.5); transition: color 1s, text-shadow 1s; }
         .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); margin-bottom: 25px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); line-height: 1.1; }
         .poem-text { font-size: clamp(1.1rem, 2vw, 1.4rem); line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
 
-        /* ANTI-OVERLAP GRID SYSTEM */
-        .gallery { 
-            display: grid; 
-            /* This guarantees perfect mathematical spacing. No overlapping ever. */
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 60px; /* Massive gap to ensure frames have breathing room */
-            width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; 
-            place-items: center; /* Locks frames exactly in the center of their grid cell */
-        }
-        
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 60px; width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; place-items: center; }
         .parallax-wrap { will-change: transform; width: 100%; display: flex; justify-content: center; }
 
-        .frame {
-            width: 100%; max-width: 320px; aspect-ratio: 3/4; /* Keeps perfect polaroid proportions */
-            border-radius: 8px; padding: 12px;
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
-            transition: border 0.4s ease; position: relative;
-        }
-        .frame:hover { border-color: rgba(0, 100, 177, 0.8); z-index: 50; }
+        .frame { width: 100%; max-width: 320px; aspect-ratio: 3/4; border-radius: 8px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px rgba(0,0,0,0.7); transition: border 0.4s ease; position: relative; }
+        .frame:hover { border-color: rgba(255,255,255,0.8); z-index: 50; }
         
-        .photo-inner { 
-            width: 100%; height: 100%; border-radius: 4px; 
-            background-color: #111; /* Fallback color before load */
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            filter: grayscale(60%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
-            position: relative; overflow: hidden; 
-        }
-        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); transform: scale(1.03); }
+        .photo-inner { width: 100%; height: 100%; border-radius: 4px; background-color: #111; background-size: cover; background-position: center; background-repeat: no-repeat; filter: grayscale(40%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; }
+        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(255,255,255,0.3); transform: scale(1.03); }
 
         .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
 
-        /* --- FULLSCREEN LIGHTBOX --- */
         #lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); z-index: 100000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
         #lightbox.active { opacity: 1; pointer-events: all; }
-        #lightbox-img { max-width: 90%; max-height: 90%; width: auto; height: auto; border-radius: 8px; box-shadow: 0 0 80px rgba(0, 100, 177, 0.8); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        #lightbox-img { max-width: 90%; max-height: 90%; width: auto; height: auto; border-radius: 8px; box-shadow: 0 0 80px rgba(255,255,255, 0.5); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: contain; background-repeat: no-repeat; background-position: center; }
         #lightbox.active #lightbox-img { transform: scale(1); width: 85vw; height: 85vh; }
         .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; color: #fff; opacity: 0.6; transition: 0.3s; padding: 20px; font-family: sans-serif; cursor: pointer !important; }
-        .close-btn:hover { opacity: 1; transform: rotate(90deg); color: var(--uta-blue); }
+        .close-btn:hover { opacity: 1; transform: rotate(90deg); }
 
     </style>
 </head>
-<body>
+<body data-theme="uta">
 
     <div id="scroll-progress"></div>
     <div id="audio-toggle" class="interactable">
         <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
     </div>
-    <audio id="bgm" loop><source src="bg-music.mp3" type="audio/mpeg"></audio>
+    
+    <audio id="bgm" loop crossorigin="anonymous"><source src="bg-music.mp3" type="audio/mpeg"></audio>
 
     <div id="cursor"></div>
     <div id="cursor-trail"></div>
@@ -158,15 +124,15 @@
     <canvas id="webgl-canvas"></canvas>
 
     <main id="main-content">
-        <section class="hero panel">
+        <section class="hero panel" data-color="#0064B1">
             <div>
-                <h1 class="scramble-title">Sai Srivalli Satya<br><span style="color: var(--uta-blue);">Yashashwini</span></h1>
+                <h1 class="scramble-title">Sai Srivalli Satya<br><span style="color: var(--white);">Yashashwini</span></h1>
                 <h2 class="scramble-title">(Yashu)</h2>
             </div>
             <div class="scroll-down">COMMENCE SCROLL</div>
         </section>
 
-        <section class="panel chapter-trigger">
+        <section class="panel chapter-trigger" data-color="#ffb6c1">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 1</span>Tiny Paws & Big Dreams</h2>
@@ -183,7 +149,7 @@
             </div>
         </section>
 
-        <section class="panel chapter-trigger">
+        <section class="panel chapter-trigger" data-color="#FFD700">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 2</span>Pigtails & Playtime</h2>
@@ -198,7 +164,7 @@
             </div>
         </section>
 
-        <section class="panel chapter-trigger">
+        <section class="panel chapter-trigger" data-color="#8A2BE2">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 3</span>Rebellious & Radiant</h2>
@@ -213,7 +179,7 @@
             </div>
         </section>
 
-        <section class="panel chapter-trigger">
+        <section class="panel chapter-trigger" data-color="#00CED1">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 4</span>Finding Her Wings</h2>
@@ -227,7 +193,7 @@
             </div>
         </section>
 
-        <section class="panel chapter-trigger">
+        <section class="panel chapter-trigger" data-color="#E0E0E0">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 5</span>A Circle of Light</h2>
@@ -248,9 +214,9 @@
             </div>
         </section>
 
-        <section class="panel chapter-trigger" style="padding-bottom: 25vh;">
+        <section class="panel chapter-trigger" style="padding-bottom: 25vh;" data-color="#0064B1">
             <div class="chapter-container">
-                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
+                <h1 class="scramble-title grad-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
                 <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
                     <h2 class="chapter-title scramble-title"><span class="chap-num">FINALE</span>The Maverick: UTA '26</h2>
                     <p class="poem-text cipher-text" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
@@ -298,11 +264,11 @@
                 if(isTouch) return;
                 cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 trail.style.transform = 'translate(-50%, -50%) scale(1)';
-                trail.style.background = 'transparent'; trail.style.borderColor = 'rgba(0, 100, 177, 0.9)';
+                trail.style.background = 'transparent'; 
+                // Color resets are handled dynamically below now
             });
         });
 
-        // Safe 3D Tilt - Prevents Rendering Glitches
         document.querySelectorAll('.frame').forEach(frame => {
             frame.addEventListener('mousemove', (e) => {
                 if (isTouch) return;
@@ -318,23 +284,6 @@
             });
         });
 
-        // Audio Logic
-        const audioBtn = document.getElementById('audio-toggle');
-        const bgMusic = document.getElementById('bgm');
-        let isMuted = false;
-        
-        audioBtn.addEventListener('click', () => {
-            isMuted = !isMuted;
-            if(isMuted) {
-                bgMusic.pause(); audioBtn.classList.add('muted');
-                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
-            } else {
-                bgMusic.play(); audioBtn.classList.remove('muted');
-                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
-            }
-        });
-
-        // Lightbox Logic
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         
@@ -346,14 +295,6 @@
         });
         lightbox.addEventListener('click', () => {
             lightbox.classList.remove('active'); document.body.style.overflowY = 'auto';
-        });
-
-        // Scroll Progress Bar
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('scroll-progress').style.width = scrolled + "%";
         });
 
         // ==========================================
@@ -368,11 +309,12 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-        const blueLight = new THREE.PointLight(0x0064B1, 10, 100); blueLight.position.set(-15, 10, 5); scene.add(blueLight);
-        const whiteLight = new THREE.PointLight(0xffffff, 5, 100); whiteLight.position.set(15, -15, 5); scene.add(whiteLight);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+        
+        // Dynamic Lights that will change color
+        const mainLight = new THREE.PointLight(0x0064B1, 10, 100); mainLight.position.set(-15, 10, 5); scene.add(mainLight);
+        const accentLight = new THREE.PointLight(0xffffff, 5, 100); accentLight.position.set(15, -15, 5); scene.add(accentLight);
 
-        // Heavy Crystal Glass
         const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x004a8c, metalness: 0.2, roughness: 0.1, transmission: 0.95, thickness: 2.5, clearcoat: 1.0, clearcoatRoughness: 0.1, ior: 1.5, side: THREE.DoubleSide });
         const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
 
@@ -386,11 +328,21 @@
         baseCap.add(new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat));
         baseCap.position.y = -1.2;
 
+        // Interactive Rings
+        const rings = [];
+        for(let i=0; i<2; i++) {
+            const rGeo = new THREE.TorusGeometry(6 + (i*2), 0.05, 16, 100);
+            const rMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 });
+            const ring = new THREE.Mesh(rGeo, rMat);
+            ring.rotation.x = Math.random() * Math.PI;
+            quantumGroup.add(ring);
+            rings.push(ring);
+        }
+
         quantumGroup.add(board, baseCap);
         quantumGroup.position.set(7, -3, -5); 
         scene.add(quantumGroup);
 
-        // Vortex Setup
         const pGeo = new THREE.BufferGeometry();
         const particleCount = isTouch ? 2500 : 6000;
         const pPos = new Float32Array(particleCount * 3);
@@ -402,11 +354,49 @@
         const pMat = new THREE.PointsMaterial({ size: 0.15, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
         const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
 
-        // Bloom Post-Processing
         const renderScene = new THREE.RenderPass(scene, camera);
         const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85);
         const composer = new THREE.EffectComposer(renderer);
         composer.addPass(renderScene); composer.addPass(bloomPass);
+
+        // ==========================================
+        // WEB AUDIO API: THE REACTIVE UNIVERSE
+        // ==========================================
+        const audioBtn = document.getElementById('audio-toggle');
+        const bgMusic = document.getElementById('bgm');
+        let isMuted = false;
+        
+        let audioCtx, analyser, dataArray;
+        let isAudioInit = false;
+
+        function initAudio() {
+            if(isAudioInit) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaElementSource(bgMusic);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                isAudioInit = true;
+            } catch (e) {
+                console.log("Audio API blocked or not supported", e);
+            }
+        }
+
+        audioBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if(isMuted) {
+                bgMusic.pause(); audioBtn.classList.add('muted');
+                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+            } else {
+                bgMusic.play(); audioBtn.classList.remove('muted');
+                if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+            }
+        });
 
         // ==========================================
         // ANIMATION SEQUENCES
@@ -429,32 +419,25 @@
             }});
             gsap.to('main', { opacity: 1, duration: 2, delay: 0.5 });
             audioBtn.classList.add('visible');
-            bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
-            gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
             
+            initAudio();
+            bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
+            
+            gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
             initAmbientFloat();
         });
 
-        // Anti-Overlap Micro Drift
         function initAmbientFloat() {
             gsap.utils.toArray('.parallax-wrap').forEach(wrap => {
-                gsap.to(wrap, {
-                    y: `+=${Math.random() * 4 - 2}`, // Micro drift only
-                    x: `+=${Math.random() * 4 - 2}`,
-                    rotationZ: Math.random() * 1 - 0.5,
-                    duration: Math.random() * 2 + 3,
-                    yoyo: true, repeat: -1, ease: "sine.inOut", delay: Math.random() * 2
-                });
+                gsap.to(wrap, { y: `+=${Math.random() * 4 - 2}`, x: `+=${Math.random() * 4 - 2}`, rotationZ: Math.random() * 1 - 0.5, duration: Math.random() * 2 + 3, yoyo: true, repeat: -1, ease: "sine.inOut", delay: Math.random() * 2 });
             });
         }
 
-        // 3D Glass Scroll Animation
         const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });
         capTl.to(quantumGroup.position, { x: -8, y: 3, z: 2 }, 0).to(quantumGroup.rotation, { x: Math.PI/1.5, y: Math.PI }, 0)
              .to(board.position, { y: 4 }, 0).to(quantumGroup.position, { x: 8, y: -2, z: 8 }, 0.4).to(quantumGroup.rotation, { x: -0.2, y: Math.PI*2 }, 0.4)
              .to(board.position, { y: 0 }, 0.4).to(quantumGroup.position, { x: 0, y: 0, z: -8 }, 0.8).to(quantumGroup.rotation, { x: 0.3, y: Math.PI*4 }, 0.8);
 
-        // Cipher Matrix Logic
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         function decodeText(element) {
             if(element.decoded) return; element.decoded = true;
@@ -463,6 +446,32 @@
                 element.innerText = original.split("").map((l, i) => i < iter ? original[i] : letters[Math.floor(Math.random()*36)]).join("");
                 if(iter >= original.length) clearInterval(int); iter += 1/3;
             }, 30);
+        }
+
+        // --- EMOTIONAL COLOR GRADING ---
+        const panels = gsap.utils.toArray('.panel');
+        panels.forEach((panel, i) => {
+            const color = panel.getAttribute('data-color');
+            if(color) {
+                ScrollTrigger.create({
+                    trigger: panel,
+                    start: "top 50%",
+                    end: "bottom 50%",
+                    onEnter: () => changeTheme(color),
+                    onEnterBack: () => changeTheme(color)
+                });
+            }
+        });
+
+        function changeTheme(hexCode) {
+            const color = new THREE.Color(hexCode);
+            gsap.to(mainLight.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 });
+            gsap.to(pMat.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 });
+            gsap.to(glassMat.color, { r: color.r * 0.7, g: color.g * 0.7, b: color.b * 0.7, duration: 1.5 });
+            document.documentElement.style.setProperty('--uta-blue', hexCode);
+            document.documentElement.style.setProperty('--uta-glow', `${hexCode}99`);
+            document.getElementById('scroll-progress').style.background = hexCode;
+            document.getElementById('cursor-trail').style.borderColor = hexCode;
         }
 
         document.querySelectorAll('.chapter-trigger').forEach((chapter) => {
@@ -483,11 +492,38 @@
             }
         });
 
-        // Loop
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + "%";
+        });
+
+        // ==========================================
+        // RENDER LOOP WITH AUDIO ANALYSIS
+        // ==========================================
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
+            
+            // Audio Reactivity
+            let bassScale = 1;
+            if (isAudioInit && !isMuted) {
+                analyser.getByteFrequencyData(dataArray);
+                let bass = 0;
+                for(let i=0; i<10; i++) bass += dataArray[i]; // Sample low frequencies
+                bassScale = 1 + (bass / 2550) * 0.3; // Scale up to 30% larger based on bass
+            }
+
+            // Apply music pulse to vortex and rings
+            vortex.scale.set(bassScale, bassScale, bassScale);
+            rings.forEach((r, i) => {
+                r.scale.set(bassScale, bassScale, bassScale);
+                r.rotation.x += 0.01 * (i+1);
+                r.rotation.y += 0.02 * (i+1);
+            });
+
             vortex.rotation.y = time * 0.02; vortex.rotation.x = time * 0.01;
             quantumGroup.position.y += Math.sin(time * 2) * 0.005;
 

@@ -3,527 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DHRUMIL RANA // QUANTUM_NEXUS.v2.0</title>
+    <title>Yashu's Graduation Journey | UTA '26</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
+        /* --- CORE STYLES & THEME --- */
         :root {
-            --accent: #00f0ff;
-            --accent-alt: #b500ff;
-            --bg: #020204;
-            --glass: rgba(10, 10, 15, 0.45);
-            --border: rgba(0, 240, 255, 0.25);
-            --text-main: #ffffff;
-            --text-dim: #9aa0a6;
+            --uta-blue: #0064B1;
+            --uta-orange: #F58025; /* Subtle accent */
+            --bg-dark: #050505;
+            --text-light: #F8F9FA;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* --- ADVANCED CYBER CURSOR --- */
-        html, body {
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="2" fill="%2300f0ff"/><circle cx="15" cy="15" r="12" fill="none" stroke="%2300f0ff" stroke-width="1" stroke-dasharray="4 2" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0 15 15" to="360 15 15" dur="4s" repeatCount="indefinite"/></circle></svg>') 15 15, auto;
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-        
-        a, button, .glass-card {
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="4" fill="%23ffffff"/><circle cx="15" cy="15" r="14" fill="none" stroke="%23ffffff" stroke-width="2" opacity="0.9"/></svg>') 15 15, pointer !important;
         }
 
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--accent), var(--accent-alt)); }
-        ::selection { background: var(--accent-alt); color: #fff; }
-
-        /* --- BOOT SEQUENCE HUD --- */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 100000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: var(--accent);
-            font-family: 'Space Mono', monospace; transition: opacity 0.8s ease-in-out;
-        }
-        .boot-text { font-size: 1.2rem; margin-bottom: 20px; text-shadow: 0 0 10px var(--accent); }
-        .progress-bar-container { width: 300px; height: 2px; background: rgba(0,240,255,0.2); position: relative; }
-        .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; box-shadow: 0 0 20px var(--accent); }
-
-        /* --- CRT OVERLAY --- */
-        #crt-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
-            z-index: 9999; pointer-events: none; opacity: 0.7;
-        }
-
-        /* --- 3D CANVAS --- */
+        /* 3D Canvas fixed in background */
         #webgl-canvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0; pointer-events: none; filter: contrast(1.2) brightness(1.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        /* --- CONTENT WRAPPER --- */
-        #scroll-container { position: relative; z-index: 10; width: 100%; display: flex; flex-direction: column; align-items: center; }
-
-        section {
-            min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
-            padding: 100px 5%; max-width: 1200px; width: 100%;
+        main {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        #hero { min-height: 100vh; align-items: flex-start; justify-content: center; margin-bottom: 30vh;}
-        #projects { min-height: 120vh; align-items: flex-end; margin-bottom: 30vh;}
-        #experience { min-height: 150vh; align-items: flex-start; padding-bottom: 20vh; }
-
-        /* --- HOLOGRAPHIC GLASS CARDS --- */
-        .glass-card {
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.05); border-top: 1px solid var(--border); border-left: 1px solid var(--border);
-            border-radius: 16px; padding: 50px; position: relative; overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02);
-            transform-style: preserve-3d; perspective: 1000px; max-width: 650px; width: 100%;
-            transition: border-color 0.4s, box-shadow 0.4s;
+        .panel {
+            min-height: 100vh;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            padding: 5% 10%;
         }
 
-        /* Glare effect inside the card */
-        .glass-card::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 50%);
-            opacity: 0; pointer-events: none; transition: opacity 0.3s; mix-blend-mode: overlay;
-        }
-        .glass-card:hover::after { opacity: 1; }
-        .glass-card:hover { border-color: var(--accent); box-shadow: 0 20px 80px rgba(0,240,255,0.15), inset 0 0 20px rgba(0,240,255,0.05); }
-
-        .system-tag {
-            font-family: 'Space Mono', monospace; color: var(--accent); font-size: 0.85rem;
-            letter-spacing: 5px; margin-bottom: 25px; text-transform: uppercase; font-weight: 700;
-            display: inline-block; transform: translateZ(30px);
+        /* --- TYPOGRAPHY --- */
+        .hero {
+            justify-content: flex-end; /* Push text to right, 3D hologram on left */
+            text-align: right;
+            padding-top: 15vh;
         }
 
-        /* Typography */
-        h1 { font-size: 6vw; font-weight: 900; line-height: 1; margin-bottom: 25px; letter-spacing: -4px; transform: translateZ(50px); text-transform: uppercase; }
-        h1 .glitch-text { position: relative; display: inline-block; color: #fff; text-shadow: 0 0 30px rgba(0,240,255,0.4); }
-        h2 { font-size: 2.8rem; font-weight: 700; margin-bottom: 15px; letter-spacing: -2px; transform: translateZ(40px); color: #fff; }
-        h3 { font-size: 1.6rem; margin-bottom: 5px; color: #fff; transform: translateZ(30px); }
-        p { color: var(--text-dim); font-size: 1.15rem; margin-bottom: 25px; line-height: 1.7; transform: translateZ(20px); font-weight: 300; }
-        
-        .tech-stack { transform: translateZ(25px); margin-bottom: 10px; }
-        .tech-stack span {
-            font-family: 'Space Mono'; font-size: 0.75rem; color: var(--text-main); font-weight: 700;
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 6px 12px; border-radius: 4px; margin-right: 8px; display: inline-block; margin-bottom: 8px;
-            transition: 0.3s;
+        .hero-text h1 {
+            font-size: 4rem;
+            color: var(--text-light);
+            letter-spacing: 2px;
+            line-height: 1.1;
+            text-shadow: 0 0 20px rgba(0, 100, 177, 0.6);
         }
-        .glass-card:hover .tech-stack span { border-color: rgba(0,240,255,0.3); color: var(--accent); background: rgba(0,240,255,0.05); }
 
-        /* Elite Buttons */
-        .btn-group { display: flex; gap: 15px; margin-top: 35px; transform: translateZ(40px); }
-        .action-btn {
-            padding: 14px 30px; border: 1px solid rgba(255,255,255,0.15); color: #fff;
-            text-decoration: none; font-family: 'Space Mono'; font-size: 0.85rem; font-weight: 700; border-radius: 4px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-flex; align-items: center; gap: 10px;
-            background: rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        .hero-text .highlight { color: var(--uta-blue); }
+
+        .hero-text h2 {
+            font-size: 2.5rem;
+            font-style: italic;
+            font-weight: 300;
+            margin: 10px 0 20px 0;
+            color: #ccc;
         }
-        .action-btn::before { content:''; position: absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
-        .action-btn:hover::before { left: 100%; }
-        .action-btn:hover { background: #fff; color: #000; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        
-        .btn-accent { border-color: var(--accent); color: var(--accent); background: rgba(0,240,255,0.05); text-shadow: 0 0 10px var(--accent); }
-        .btn-accent:hover { background: var(--accent); color: #000; box-shadow: 0 0 30px var(--accent); text-shadow: none; }
-        
-        .btn-purple { border-color: var(--accent-alt); color: var(--accent-alt); background: rgba(181,0,255,0.05); text-shadow: 0 0 10px var(--accent-alt); }
-        .btn-purple:hover { background: var(--accent-alt); color: #fff; box-shadow: 0 0 30px var(--accent-alt); text-shadow: none; }
 
-        /* Experience Rows */
-        .exp-container { display: flex; flex-direction: column; width: 100%; }
-        .exp-row { 
-            display: flex; gap: 30px; padding: 40px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
-            text-decoration: none; color: inherit; transition: 0.4s; transform: translateZ(20px);
+        .hero-text p {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--uta-orange);
         }
-        .exp-row:hover { transform: translateZ(30px) translateX(20px); }
-        
-        .exp-badge { 
-            display: flex; align-items: center; justify-content: center; width: 70px; height: 70px; 
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.1); color: #fff; 
-            font-family: 'Space Mono'; font-size: 1.5rem; font-weight: 900; border-radius: 12px; 
-            flex-shrink: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        /* --- INSTAX PHOTO CARDS (With 3D Flip) --- */
+        .chapter { justify-content: flex-end; }
+        .chapter:nth-child(even) { justify-content: flex-start; }
+
+        .instax-container {
+            width: 320px;
+            height: 380px;
+            perspective: 1000px; /* Required for 3D flip */
+            cursor: pointer;
+            margin: 50px 0;
         }
-        .exp-row:hover .exp-badge { background: var(--accent); border-color: var(--accent); color: #000; box-shadow: 0 0 30px var(--accent); transform: scale(1.1) rotate(5deg); }
-        
-        .exp-date { font-family: 'Space Mono'; color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
 
-        /* Scroll Animations */
-        .reveal-3d { opacity: 0; transform: translateY(100px) scale(0.9) rotateX(-10deg); transition: opacity 1s ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal-3d.visible { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+        .instax-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
 
-        /* Navigation */
-        nav { position: fixed; top: 0; left: 0; width: 100%; padding: 40px 5%; display: flex; justify-content: space-between; z-index: 100; pointer-events: none; }
-        .nav-logo { font-family: 'Space Mono'; font-weight: 900; color: #fff; letter-spacing: 4px; pointer-events: auto; font-size: 1.2rem; }
-        .nav-logo span { color: var(--accent); animation: pulse-text 2s infinite; }
-        .nav-links a { color: #fff; font-size: 1.5rem; margin-left: 30px; transition: 0.3s; pointer-events: auto; display: inline-block;}
-        .nav-links a:hover { color: var(--accent); transform: scale(1.3) translateY(-5px); text-shadow: 0 0 20px var(--accent); }
+        .instax-container.flipped .instax-inner {
+            transform: rotateY(180deg);
+        }
 
-        @keyframes pulse-text { 0%, 100% { text-shadow: 0 0 10px var(--accent); } 50% { text-shadow: 0 0 30px var(--accent), 0 0 10px #fff; } }
+        .instax-front, .instax-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background-color: #fff;
+            padding: 15px 15px 50px 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        @media (max-width: 900px) {
-            h1 { font-size: 4rem; }
-            .glass-card { padding: 30px 20px; }
-            section { align-items: center !important; text-align: left; }
-            .exp-row { flex-direction: column; gap: 15px; padding: 30px 0;}
-            .btn-group { flex-direction: column; }
+        .instax-back {
+            transform: rotateY(180deg);
+            background-color: #fdfdfd;
+            justify-content: center;
+            padding: 30px;
+            color: #222;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 280px;
+            background-color: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-bottom: 15px;
+            overflow: hidden;
+            /* Replace with: background-image: url('your-image.jpg'); background-size: cover; background-position: center; */
+        }
+
+        .caption {
+            color: var(--bg-dark);
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .note-text {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .rotate-left { transform: rotate(-4deg); }
+        .rotate-right { transform: rotate(4deg); }
+
+        .final-chapter {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 40px;
+            padding-bottom: 10vh;
+        }
+
+        .congrats-text {
+            color: var(--text-light);
+            font-size: 3rem;
+            text-shadow: 0 0 30px rgba(0, 100, 177, 0.8);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 5vh;
+            right: 10vw;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: var(--uta-blue);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 768px) {
+            .hero, .chapter { justify-content: center; text-align: center; }
+            .hero-text h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
-<div id="boot-screen">
-    <div class="boot-text">INITIALIZING NEURAL KERNEL... <span id="boot-pct">0</span>%</div>
-    <div class="progress-bar-container">
-        <div class="progress-fill" id="boot-fill"></div>
-    </div>
-</div>
+    <canvas id="webgl-canvas"></canvas>
 
-<div id="crt-overlay"></div>
-<canvas id="webgl-canvas"></canvas>
-
-<nav>
-    <div class="nav-logo">DHRUMIL<span>_</span>RANA</div>
-    <div class="nav-links">
-        <a href="https://github.com/dhrumilrana25" target="_blank"><i class="fa-brands fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/dhrumil-rana-265316232/" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
-    </div>
-</nav>
-
-<div id="scroll-container">
-    
-    <section id="hero">
-        <div class="glass-card reveal-3d magnetic-glass">
-            <span class="system-tag">SYS.STATUS // ONLINE</span>
-            <h1><span class="glitch-text">Data<br>Scientist</span></h1>
-            <p>Architecting autonomous multi-agent systems, massive-scale graph neural networks, and zero-day threat detection logic.</p>
-            <div style="font-family: 'Space Mono'; color: #fff; font-size: 0.85rem; margin-top: 10px; font-weight: 700; transform: translateZ(20px);">
-                <i class="fa-solid fa-satellite-dish" style="color: var(--accent); margin-right: 10px; animation: pulse-text 2s infinite;"></i> MS DATA SCIENCE @ UT ARLINGTON
+    <main>
+        <section class="hero panel">
+            <div class="hero-text">
+                <h1>Sai Srivalli Satya<br><span class="highlight">Yashashwini</span></h1>
+                <h2>(Yashu)</h2>
+                <p>The Maverick Milestone | May 3, 2026</p>
             </div>
-            <div class="btn-group">
-                <a href="Dhrumil_Rana_Resume.pdf" target="_blank" class="action-btn btn-accent"><i class="fa-solid fa-download"></i> SECURE_DOSSIER</a>
-            </div>
-        </div>
-    </section>
+            <div class="scroll-indicator">SCROLL DOWN ↓</div>
+        </section>
 
-    <section id="projects">
-        <div style="display: flex; flex-direction: column; gap: 60px; width: 100%; align-items: flex-end;">
-            
-            <div class="glass-card reveal-3d magnetic-glass">
-                <span class="system-tag">DEPLOYMENT // 01</span>
-                <h2>Agentic-Cleanse Factory</h2>
-                <p>Autonomous ETL pipeline engineered with self-healing code execution and security logic loops. Powered by LangGraph & Groq AI.</p>
-                <div class="tech-stack"><span>AGENTIC_AI</span> <span>LANGGRAPH</span> <span>STREAMLIT</span></div>
-                <div class="btn-group">
-                    <a href="https://github.com/dhrumilrana25/Agentic-Cleanse" target="_blank" class="action-btn"><i class="fa-brands fa-github"></i> REPO</a>
-                    <a href="https://dhrumil-cleanse.streamlit.app/" target="_blank" class="action-btn btn-accent"><i class="fa-solid fa-bolt"></i> LIVE_DEMO</a>
+        <section class="chapter panel">
+            <div class="instax-container rotate-left" onclick="this.classList.toggle('flipped')">
+                <div class="instax-inner">
+                    <div class="instax-front">
+                        <div class="photo-placeholder">Photo 1 Placeholder</div>
+                        <p class="caption">Tiny Paws & Big Dreams</p>
+                    </div>
+                    <div class="instax-back">
+                        <p class="note-text">"Before the degrees and the late-night coding sessions, you were just a girl with a big imagination. Look how far you've come."</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="glass-card reveal-3d magnetic-glass">
-                <span class="system-tag">DEPLOYMENT // 02</span>
-                <h2>Twitter Link Prediction</h2>
-                <p>Social discovery engine mapping network topology. Processed 1.2M+ nodes using DeepWalk embeddings and advanced graph heuristics.</p>
-                <div class="tech-stack"><span>GRAPH_ML</span> <span>DEEPWALK</span> <span>NETWORKX</span></div>
-                <div class="btn-group">
-                    <a href="https://github.com/dhrumilrana25/Twitter-Scale-Link-Prediction-Engine" target="_blank" class="action-btn"><i class="fa-brands fa-github"></i> REPO</a>
-                    <a href="Link_Prediction_Embeddings.pdf" target="_blank" class="action-btn btn-purple"><i class="fa-solid fa-file-pdf"></i> RESEARCH_PAPER</a>
+        <section class="chapter panel">
+            <div class="instax-container rotate-right" onclick="this.classList.toggle('flipped')">
+                <div class="instax-inner">
+                    <div class="instax-front">
+                        <div class="photo-placeholder">Photo 2 Placeholder</div>
+                        <p class="caption">Pigtails & Playtime</p>
+                    </div>
+                    <div class="instax-back">
+                        <p class="note-text">"Write your personal memory about her childhood here. Tap any card to flip it back and forth!"</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="glass-card reveal-3d magnetic-glass">
-                <span class="system-tag">DEPLOYMENT // 03</span>
-                <h2>IoT Malware Defense</h2>
-                <p>Real-time behavioral analytics for IoT security protocols. Engineered high-dimensional feature extraction resulting in 95.38% verified accuracy.</p>
-                <div class="tech-stack"><span>CYBER_SEC</span> <span>ML_ANALYTICS</span> <span>ANOMALY</span></div>
-                <div class="btn-group">
-                    <a href="https://github.com/dhrumilrana25/IoT-Malware-Detection-Network-Analytics" target="_blank" class="action-btn"><i class="fa-brands fa-github"></i> VIEW_REPO</a>
+        <section class="chapter panel">
+            <div class="instax-container rotate-left" onclick="this.classList.toggle('flipped')">
+                <div class="instax-inner">
+                    <div class="instax-front">
+                        <div class="photo-placeholder">Photo 3 Placeholder</div>
+                        <p class="caption">Rebellious & Radiant</p>
+                    </div>
+                    <div class="instax-back">
+                        <p class="note-text">"Write a sweet note about her teenage years here."</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-        </div>
-    </section>
-
-    <section id="experience">
-        <div class="glass-card reveal-3d magnetic-glass" style="max-width: 900px;">
-            <span class="system-tag">ARCHIVE // PROFESSIONAL_TIMELINE</span>
-            
-            <div class="exp-container">
-                <a href="https://www.novachat.io/" target="_blank" class="exp-row">
-                    <div class="exp-badge">NC</div>
-                    <div>
-                        <div class="exp-date">APR 2026 — PRESENT</div>
-                        <h3>NovaChatAI</h3>
-                        <p>AI Engineer Intern // Architecting autonomous AI agent workflows and complex conversational logic leveraging LangGraph and LangChain.</p>
+        <section class="chapter panel">
+            <div class="instax-container rotate-right" onclick="this.classList.toggle('flipped')">
+                <div class="instax-inner">
+                    <div class="instax-front">
+                        <div class="photo-placeholder">Photo 4 Placeholder</div>
+                        <p class="caption">Finding Her Wings</p>
                     </div>
-                </a>
-
-                <a href="https://www.uta.edu/student-affairs/campus-recreation/facilities/mac" target="_blank" class="exp-row">
-                    <div class="exp-badge">MC</div>
-                    <div>
-                        <div class="exp-date">MAR 2025 — JUL 2026</div>
-                        <h3>Maverick Activities Center (UTA)</h3>
-                        <p>Building Manager // Managing operational workflows, emergency response logistics, and facility security protocols.</p>
+                    <div class="instax-back">
+                        <p class="note-text">"To the late nights, the hard work, and the beautiful young woman you've become."</p>
                     </div>
-                </a>
-
-                <a href="https://www.odoo.com" target="_blank" class="exp-row">
-                    <div class="exp-badge">OD</div>
-                    <div>
-                        <div class="exp-date">JUN 2024 — SEP 2024</div>
-                        <h3>Odoo</h3>
-                        <p>Software Developer Intern // Engineered backend logic modules and optimized database architectures for global ERP integration.</p>
-                    </div>
-                </a>
-
-                <a href="https://silentinfotech.com" target="_blank" class="exp-row" style="border: none; padding-bottom: 0;">
-                    <div class="exp-badge">SI</div>
-                    <div>
-                        <div class="exp-date">JAN 2024 — MAY 2024</div>
-                        <h3>Silent Infotech Pvt. Ltd.</h3>
-                        <p>Research Analyst // Executed advanced data mining and statistical research to extract predictive insights from complex industry datasets.</p>
-                    </div>
-                </a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-</div>
+        <section class="chapter panel final-chapter">
+            <h2 class="congrats-text">Happy Graduation, Yashu!</h2>
+            <div class="instax-container" onclick="this.classList.toggle('flipped')">
+                <div class="instax-inner">
+                    <div class="instax-front">
+                        <div class="photo-placeholder" style="background-color: #0064B1; color: white;">UTA Grad Photo</div>
+                        <p class="caption">The Maverick: UTA '26</p>
+                    </div>
+                    <div class="instax-back">
+                        <p class="note-text">"I am incredibly proud to be your partner. Here's to your bright future and all the amazing things you will build. I love you."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<script>
-    /* =========================================================================
-       0. BOOT SEQUENCE LOGIC
-       ========================================================================= */
-    let bootPct = 0;
-    const bootText = document.getElementById('boot-pct');
-    const bootFill = document.getElementById('boot-fill');
-    const bootScreen = document.getElementById('boot-screen');
-
-    const bootInterval = setInterval(() => {
-        bootPct += Math.floor(Math.random() * 15) + 5;
-        if(bootPct > 100) bootPct = 100;
+    <script>
+        // ==========================================
+        // 1. THREE.JS PARTICLE HOLOGRAM SETUP
+        // ==========================================
+        const canvas = document.querySelector('#webgl-canvas');
+        const scene = new THREE.Scene();
         
-        bootText.innerText = bootPct;
-        bootFill.style.width = bootPct + '%';
+        // Add a subtle fog to make particles fade in the distance
+        scene.fog = new THREE.FogExp2(0x050505, 0.08);
 
-        if(bootPct === 100) {
-            clearInterval(bootInterval);
-            setTimeout(() => {
-                bootScreen.style.opacity = '0';
-                setTimeout(() => bootScreen.style.display = 'none', 800);
-            }, 400);
-        }
-    }, 150);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 8;
+        camera.position.x = -2; // Offset camera to put model on the left
 
-    /* =========================================================================
-       1. THREE.JS ULTIMATE ENVIRONMENT SETUP
-       ========================================================================= */
-    const canvas = document.getElementById('webgl-canvas');
-    const scene = new THREE.Scene();
-    
-    // Dynamic Fog that shifts color later
-    scene.fog = new THREE.FogExp2(0x020204, 0.0012);
-
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Performance optimization
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Initial Camera Position
-    camera.position.set(0, 150, 400);
-    camera.lookAt(0, 0, 0);
-
-    /* --- 2. THE NEURAL LOSS-SURFACE (WAVING TERRAIN) --- */
-    const planeGeom = new THREE.PlaneGeometry(3000, 3000, 60, 60);
-    // Rotate to lay flat
-    planeGeom.rotateX(-Math.PI / 2);
-    
-    // Store original Y positions for sine wave animation
-    const vertices = planeGeom.attributes.position.array;
-    const originalY = [];
-    for(let i = 1; i < vertices.length; i+=3) {
-        originalY.push(vertices[i]);
-    }
-
-    const terrainMaterial = new THREE.PointsMaterial({
-        size: 2.5,
-        color: 0x00f0ff,
-        transparent: true,
-        opacity: 0.6,
-        blending: THREE.AdditiveBlending
-    });
-
-    const terrain = new THREE.Points(planeGeom, terrainMaterial);
-    terrain.position.y = -100;
-    scene.add(terrain);
-
-    /* --- 3. THE QUANTUM CORE (MULTI-LAYERED ANOMALY) --- */
-    const coreGroup = new THREE.Group();
-    
-    // Outer Shell (Icosahedron Wireframe)
-    const shellGeom = new THREE.IcosahedronGeometry(60, 2);
-    const shellMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.15 });
-    const shell = new THREE.Mesh(shellGeom, shellMat);
-    coreGroup.add(shell);
-
-    // Inner Core (Solid Octahedron)
-    const innerGeom = new THREE.OctahedronGeometry(35, 0);
-    const innerMat = new THREE.MeshBasicMaterial({ color: 0xb500ff, wireframe: true, transparent: true, opacity: 0.8 });
-    const innerCore = new THREE.Mesh(innerGeom, innerMat);
-    coreGroup.add(innerCore);
-
-    // Orbiting Particles
-    const orbitGeom = new THREE.BufferGeometry();
-    const orbitPos = new Float32Array(300 * 3);
-    for(let i=0; i<300*3; i+=3) {
-        const r = 70 + Math.random() * 30;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        orbitPos[i] = r * Math.sin(phi) * Math.cos(theta);
-        orbitPos[i+1] = r * Math.sin(phi) * Math.sin(theta);
-        orbitPos[i+2] = r * Math.cos(phi);
-    }
-    orbitGeom.setAttribute('position', new THREE.BufferAttribute(orbitPos, 3));
-    const orbitMat = new THREE.PointsMaterial({ size: 2, color: 0xffffff, transparent: true, opacity: 0.8 });
-    const orbitSystem = new THREE.Points(orbitGeom, orbitMat);
-    coreGroup.add(orbitSystem);
-
-    scene.add(coreGroup);
-
-    /* =========================================================================
-       SCROLL & PARALLAX PHYSICS
-       ========================================================================= */
-    let currentScroll = 0;
-    let targetScroll = 0;
-    let mouseX = 0; let mouseY = 0;
-    let targetMouseX = 0; let targetMouseY = 0;
-
-    window.addEventListener('scroll', () => {
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        targetScroll = window.scrollY / scrollHeight; // 0 to 1
-    });
-
-    document.addEventListener('mousemove', (event) => {
-        targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        targetMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    });
-
-    /* =========================================================================
-       ANIMATION LOOP (THE ENGINE)
-       ========================================================================= */
-    const clock = new THREE.Clock();
-    const colorCyan = new THREE.Color(0x00f0ff);
-    const colorPurple = new THREE.Color(0xb500ff);
-
-    function animate() {
-        requestAnimationFrame(animate);
-        const time = clock.getElapsedTime();
-
-        // 1. Smooth Interpolation
-        currentScroll += (targetScroll - currentScroll) * 0.05;
-        mouseX += (targetMouseX - mouseX) * 0.05;
-        mouseY += (targetMouseY - mouseY) * 0.05;
-
-        // 2. Dynamic Color Shifting based on Scroll
-        // Interpolate terrain and core colors from Cyan to Purple as you scroll down
-        const lerpFactor = Math.min(currentScroll * 1.5, 1); // Max out color shift at 66% scroll
-        const currentColor = colorCyan.clone().lerp(colorPurple, lerpFactor);
-        terrainMaterial.color = currentColor;
-        shellMat.color = currentColor;
-
-        // 3. Camera Flight Physics
-        // Start high, fly low and forward into the core, then past it
-        camera.position.z = 400 - (currentScroll * 1200); 
-        camera.position.y = 150 - (currentScroll * 100);
-        
-        // Add mouse parallax to camera
-        camera.position.x = mouseX * 50;
-        camera.lookAt(0, currentScroll * 100, camera.position.z - 200);
-
-        // 4. Wave Animation for Terrain (Loss Surface)
-        const positions = terrain.geometry.attributes.position.array;
-        let yIndex = 0;
-        for(let i = 1; i < positions.length; i+=3) {
-            const x = positions[i-1];
-            const z = positions[i+1];
-            // Complex wave math mimicking gradient loss surfaces
-            positions[i] = originalY[yIndex] + Math.sin(x * 0.005 + time) * 30 + Math.cos(z * 0.005 + time * 0.8) * 30;
-            yIndex++;
-        }
-        terrain.geometry.attributes.position.needsUpdate = true;
-
-        // 5. Quantum Core Rotation & Expansion
-        // As you scroll closer, it spins faster and expands
-        coreGroup.rotation.y = time * (0.2 + currentScroll * 0.5);
-        coreGroup.rotation.x = time * 0.1;
-        innerCore.rotation.y = -time * 0.4;
-        innerCore.rotation.z = time * 0.2;
-        
-        const scale = 1 + (currentScroll * 0.5);
-        coreGroup.scale.set(scale, scale, scale);
-        
-        // Push core back slightly as we scroll so we don't clip through it too early
-        coreGroup.position.z = -200 - (currentScroll * 200);
-
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // Resize Handler
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    /* =========================================================================
-       HTML INTERSECTION OBSERVER & MAGNETIC GLASS
-       ========================================================================= */
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+        // --- Generate Custom Particle Graduation Cap ---
+        const particleCount = 6000;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        const colorUtaBlue = new THREE.Color('#0064B1');
+        const colorWhite = new THREE.Color('#FFFFFF');
+
+        let particleIndex = 0;
+
+        function addParticle(x, y, z, colorObj) {
+            if (particleIndex >= particleCount) return;
+            positions[particleIndex * 3] = x;
+            positions[particleIndex * 3 + 1] = y;
+            positions[particleIndex * 3 + 2] = z;
+            colors[particleIndex * 3] = colorObj.r;
+            colors[particleIndex * 3 + 1] = colorObj.g;
+            colors[particleIndex * 3 + 2] = colorObj.b;
+            particleIndex++;
+        }
+
+        // 1. Mortarboard (The flat diamond/square on top)
+        for(let i = 0; i < 3500; i++) {
+            let x = (Math.random() - 0.5) * 6;
+            let z = (Math.random() - 0.5) * 6;
+            let y = 1; // Flat height
+            // Add slight random noise to y for a glowing volume effect
+            y += (Math.random() - 0.5) * 0.1;
+            
+            // Mix white and blue for the top
+            let c = Math.random() > 0.8 ? colorWhite : colorUtaBlue;
+            addParticle(x, y, z, c);
+        }
+
+        // 2. The Skullcap (Dome underneath)
+        for(let i = 0; i < 1500; i++) {
+            let theta = Math.random() * Math.PI * 2;
+            let radius = 1.8 + (Math.random() * 0.2); // slight thickness
+            let height = 1 - (Math.random() * 1.5); // Drops down from the board
+            let x = Math.cos(theta) * radius;
+            let z = Math.sin(theta) * radius;
+            addParticle(x, height, z, colorUtaBlue);
+        }
+
+        // 3. The Tassel (Hanging from center)
+        for(let i = 0; i < 1000; i++) {
+            // Tassel originates near center, drops off to one side
+            let drop = Math.random();
+            let x = 0.5 + (drop * 2.5); // curves outwards
+            let z = 0.5 + (drop * 2.5);
+            let y = 1 - (drop * 3); // falls downwards
+            
+            // Add scatter to the bottom to look like frayed thread
+            x += (Math.random() - 0.5) * (drop * 0.5);
+            z += (Math.random() - 0.5) * (drop * 0.5);
+
+            let c = Math.random() > 0.5 ? colorWhite : colorUtaBlue;
+            addParticle(x, y, z, c);
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        // Create glowing particle material
+        const material = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending // Creates a light-hologram glowing effect
+        });
+
+        const hologramCap = new THREE.Points(geometry, material);
+        // Tilt it slightly so it looks like it's resting dynamically
+        hologramCap.rotation.x = 0.2;
+        hologramCap.rotation.z = 0.1;
+        scene.add(hologramCap);
+
+
+        // ==========================================
+        // 2. GSAP SCROLL ANIMATIONS
+        // ==========================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate the Hologram Cap based on scroll
+        gsap.to(hologramCap.rotation, {
+            y: Math.PI * 2, // Full 360 degree spin
+            x: 0.5,         // Tilt down to see the top
+            scrollTrigger: {
+                trigger: "main",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5 // Smooth interpolation
             }
         });
-    }, { threshold: 0.15 });
 
-    document.querySelectorAll('.reveal-3d').forEach((el) => observer.observe(el));
-
-    // Magnetic Glass 3D Hover Physics
-    const glassCards = document.querySelectorAll('.magnetic-glass');
-    glassCards.forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // 3D Tilt calculation
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -8;
-            const rotateY = ((x - centerX) / centerX) * 8;
-            
-            // Dynamic Glare Positioning
-            const glareX = (x / rect.width) * 100;
-            const glareY = (y / rect.height) * 100;
-            
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            card.style.setProperty('--glare-x', `${glareX}%`);
-            card.style.setProperty('--glare-y', `${glareY}%`);
+        // Float in the Instax cards as you scroll
+        gsap.utils.toArray('.instax-container').forEach(card => {
+            gsap.from(card, {
+                y: 100,
+                opacity: 0,
+                rotation: Math.random() * 20 - 10, // Random wild rotation before snapping into place
+                duration: 1,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%", // Triggers when the top of the card hits 85% down the screen
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
         });
 
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-        });
-    });
 
-</script>
+        // ==========================================
+        // 3. ANIMATION LOOP
+        // ==========================================
+        const clock = new THREE.Clock();
+
+        function tick() {
+            const elapsedTime = clock.getElapsedTime();
+
+            // Give the cap a gentle, continuous floating hover effect
+            hologramCap.position.y = Math.sin(elapsedTime * 0.5) * 0.3;
+            
+            // Very slow ambient rotation independent of scroll
+            hologramCap.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+            window.requestAnimationFrame(tick);
+        }
+        tick();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+    </script>
 </body>
 </html>

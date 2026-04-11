@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yashu's Epic Journey | UTA '26</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
@@ -19,111 +19,124 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
-        /* --- GOD TIER STYLING --- */
+        /* --- GOD TIER VARIABLES --- */
         :root {
             --uta-blue: #0064B1;
             --uta-glow: rgba(0, 100, 177, 0.9);
-            --black: #010103;
+            --black: #020204;
             --white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        
-        body { background-color: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow-x: hidden; overflow-y: hidden; }
+        body { background-color: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow: hidden; }
 
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--black); }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); box-shadow: 0 0 10px var(--uta-glow); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); }
 
         /* --- LIQUID CURSOR --- */
-        #cursor { position: fixed; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.1s; }
-        #cursor-trail { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--uta-blue); box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.15s ease-out; }
+        #cursor { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.2s; }
+        #cursor-trail { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--uta-blue); box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.1s ease-out; }
 
-        /* --- PRELOADER SEQUENCE --- */
-        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #load-text { font-family: 'Cinzel', serif; font-size: 1.5rem; letter-spacing: 10px; color: #555; margin-bottom: 30px; }
-        .progress-bar { width: 400px; height: 1px; background: #111; position: relative; overflow: hidden; }
-        #progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--uta-blue); box-shadow: 0 0 20px var(--uta-blue); }
-        #enter-btn { margin-top: 40px; padding: 15px 50px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 4px; border-radius: 5px; opacity: 0; transform: translateY(20px); transition: all 0.4s; pointer-events: none; }
-        #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; }
-        #enter-btn.ready:hover { border-color: var(--uta-blue); box-shadow: 0 0 40px var(--uta-glow) inset, 0 0 20px var(--uta-glow); text-shadow: 0 0 10px var(--white); }
+        /* --- VAULT PRELOADER --- */
+        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; perspective: 1000px; }
+        .core { width: 60px; height: 60px; border: 2px solid var(--uta-blue); transform: rotate(45deg); animation: pulse-core 2s infinite ease-in-out; margin-bottom: 40px; box-shadow: 0 0 30px var(--uta-glow); }
+        @keyframes pulse-core { 0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.8; } 50% { transform: rotate(45deg) scale(1.2); opacity: 1; box-shadow: 0 0 50px var(--uta-glow), inset 0 0 20px var(--uta-glow); } }
+        
+        #load-text { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 12px; color: #888; margin-bottom: 30px; text-transform: uppercase; }
+        #enter-btn { padding: 15px 60px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 5px; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.5s; pointer-events: none; text-transform: uppercase; }
+        #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; border-color: var(--uta-blue); }
+        #enter-btn.ready:hover { background: rgba(0, 100, 177, 0.2); box-shadow: 0 0 40px var(--uta-glow) inset, 0 0 20px var(--uta-glow); }
 
         /* --- 3D CANVAS --- */
         #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
 
-        /* --- CONTENT LAYOUT --- */
+        /* --- MASTER LAYOUT --- */
         main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
-        .panel { min-height: 100vh; width: 100%; max-width: 1800px; display: flex; align-items: center; padding: 15vh 5%; }
+        .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
 
         .hero { justify-content: center; text-align: center; height: 100vh; }
-        .hero h1 { font-family: 'Cinzel', serif; font-size: 8rem; letter-spacing: 5px; line-height: 1; text-shadow: 0 0 60px var(--uta-glow); margin-bottom: 20px; }
-        .hero h2 { font-size: 2rem; font-weight: 200; font-style: italic; letter-spacing: 2px; }
-        .scroll-down { position: absolute; bottom: 40px; font-size: 0.8rem; letter-spacing: 6px; animation: pulse 2s infinite; opacity: 0.5; }
-        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 15px var(--white); } }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: 7.5rem; letter-spacing: 6px; line-height: 1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; }
+        .hero h2 { font-size: 2.2rem; font-weight: 200; font-style: italic; letter-spacing: 4px; color: #ccc; }
+        .scroll-down { position: absolute; bottom: 5vh; font-size: 0.8rem; letter-spacing: 8px; animation: pulse-text 2s infinite; opacity: 0.4; }
+        @keyframes pulse-text { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; text-shadow: 0 0 10px var(--white); } }
 
-        /* --- GLASSMORPHISM POEMS --- */
-        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 80px; z-index: 2; perspective: 1000px; }
-        .panel:nth-child(even) .chapter-container { align-items: flex-end; text-align: right; }
-        .panel:nth-child(odd) .chapter-container { align-items: flex-start; text-align: left; }
-        .panel:last-child .chapter-container { align-items: center; text-align: center; }
-
+        /* --- PERFECT ALIGNMENT GALLERIES --- */
+        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 6vh; z-index: 2; align-items: center; }
+        
         .poem-block {
-            max-width: 750px; background: rgba(5, 5, 8, 0.3);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px; padding: 60px; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
-            position: relative; overflow: hidden;
+            max-width: 800px; background: rgba(8, 8, 12, 0.4);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 50px 60px; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            text-align: center; border-radius: 4px;
         }
-        .poem-block::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(0, 100, 177, 0.1), transparent);
-            transform: rotate(45deg); pointer-events: none;
+        .chapter-title { font-family: 'Cinzel', serif; font-size: 3.5rem; margin-bottom: 20px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .poem-text { font-size: 1.3rem; line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
+
+        /* The Aligned Grid System */
+        .gallery { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; 
+            width: 100%; max-width: 1400px; perspective: 2000px;
+            padding: 40px 0;
         }
-
-        .chapter-title { font-family: 'Cinzel', serif; font-size: 4rem; margin-bottom: 25px; color: var(--white); text-transform: uppercase; }
-        .poem-text { font-size: 1.4rem; line-height: 2.4; color: #b0b0b0; font-weight: 200; font-style: italic; }
-
-        /* --- HOLOGRAPHIC 3D PHOTO GALLERY --- */
-        .gallery { display: flex; flex-wrap: wrap; gap: 50px; max-width: 1200px; perspective: 2500px; }
-        .panel:nth-child(even) .gallery { justify-content: flex-end; }
-        .panel:last-child .gallery { justify-content: center; max-width: 1600px; }
 
         .frame {
-            width: 300px; height: 400px; border-radius: 10px; padding: 15px;
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transform-style: preserve-3d; transition: border 0.3s;
+            width: 320px; height: 420px; border-radius: 8px; padding: 12px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            transform-style: preserve-3d; transition: border 0.4s ease;
+            position: relative;
         }
-        .frame:hover { border-color: rgba(0, 100, 177, 0.6); z-index: 50; }
+        .frame:hover { border-color: rgba(0, 100, 177, 0.8); z-index: 50; }
         
         .photo-inner {
-            width: 100%; height: 100%; border-radius: 5px; background-size: cover; background-position: center;
-            filter: grayscale(80%) brightness(0.7); transition: filter 0.5s ease;
-            transform: translateZ(30px); /* Pushes photo out from glass frame */
-            position: relative; overflow: hidden;
+            width: 100%; height: 100%; border-radius: 4px; background-size: cover; background-position: center;
+            filter: grayscale(60%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: translateZ(20px); position: relative; overflow: hidden;
         }
-        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); }
+        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); }
 
-        /* Holographic Glare Effect */
-        .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.4) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
+        .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
+
+        /* --- FULLSCREEN LIGHTBOX --- */
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px);
+            z-index: 100000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        #lightbox.active { opacity: 1; pointer-events: all; }
+        #lightbox-img {
+            max-width: 90%; max-height: 90%; width: auto; height: auto;
+            border-radius: 8px; box-shadow: 0 0 60px rgba(0, 100, 177, 0.6);
+            transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
+        #lightbox.active #lightbox-img { transform: scale(1); width: 80vw; height: 80vh; }
+        .close-btn { position: absolute; top: 40px; right: 50px; font-size: 2rem; color: #fff; opacity: 0.6; transition: 0.3s; padding: 20px; }
+        .close-btn:hover { opacity: 1; transform: rotate(90deg); color: var(--uta-blue); }
 
     </style>
 </head>
 <body>
 
-    <audio id="bgm" loop>
-        <source src="bg-music.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" loop><source src="bg-music.mp3" type="audio/mpeg"></audio>
 
     <div id="cursor"></div>
     <div id="cursor-trail"></div>
 
     <div id="preloader">
-        <div id="load-text">INITIALIZING MAVERICK PROTOCOL <span id="percent">0</span>%</div>
-        <div class="progress-bar"><div id="progress"></div></div>
+        <div class="core"></div>
+        <div id="load-text">CALIBRATING MEMORIES... <span id="percent">0</span>%</div>
         <button id="enter-btn">ENTER THE JOURNEY</button>
+    </div>
+
+    <div id="lightbox">
+        <div class="close-btn">✕</div>
+        <div id="lightbox-img"></div>
     </div>
 
     <canvas id="webgl-canvas"></canvas>
@@ -134,7 +147,7 @@
                 <h1 class="scramble-title">Sai Srivalli Satya<br><span style="color: var(--uta-blue);">Yashashwini</span></h1>
                 <h2 class="scramble-title">(Yashu)</h2>
             </div>
-            <div class="scroll-down">ACTIVATE SCROLL</div>
+            <div class="scroll-down">COMMENCE SCROLL</div>
         </section>
 
         <section class="panel chapter-trigger">
@@ -144,9 +157,10 @@
                     <p class="poem-text cipher-text" data-text="A little bundle, full of zest, Making the nursery the very best. Surrounded by joy, completeness from the start, Yashu's energy captured every heart."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-0.5"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.5"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -158,10 +172,9 @@
                     <p class="poem-text cipher-text" data-text="Laughter echoes, world so bright, Playing and growing in pure delight. With pigtails bouncing, your presence so sweet, Every childhood scene you made complete."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.0"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch2_pic4.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1.2"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.5"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -173,9 +186,10 @@
                     <p class="poem-text cipher-text" data-text="Teenage spark, vibrant and wild, Your inner bloom, never mild. Rebellious spirit, heart ablaze, Making surroundings shine in distinct ways."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.4"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-0.8"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch3_pic4.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -188,45 +202,44 @@
                 </div>
                 <div class="gallery">
                     <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-0.9"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div>
                     <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.0"><div class="photo-inner" style="background-image: url('ch4_pic4.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" style="min-height: 180vh;">
+        <section class="panel chapter-trigger">
             <div class="chapter-container">
-                <div class="poem-block" style="margin: 0 auto; text-align: center;">
+                <div class="poem-block">
                     <h2 class="chapter-title scramble-title">A Circle of Light</h2>
                     <p class="poem-text cipher-text" data-text="A chosen family, a circle so bright, Filling the days and the longest of nights. With every shared secret and memories made, A beautiful bond that will never fade."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.5"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.6"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1.2"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-0.6"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div>
                     <div class="frame interactable" data-speed="1.4"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div>
                     <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1.3"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div>
                     <div class="frame interactable" data-speed="0.7"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.6"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-0.9"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" style="padding-bottom: 20vh;">
+        <section class="panel chapter-trigger" style="padding-bottom: 25vh;">
             <div class="chapter-container">
-                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: 6rem; text-shadow: 0 0 50px var(--uta-glow);">Happy Graduation, Yashu!</h1>
-                <div class="poem-block" style="border-top-color: var(--uta-blue);">
+                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: 6rem; text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
+                <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
                     <h2 class="chapter-title scramble-title">The Maverick: UTA '26</h2>
-                    <p class="poem-text cipher-text" style="text-align: center;" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
+                    <p class="poem-text cipher-text" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -236,221 +249,196 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ==========================================
-        // MAGNETIC CURSOR & 3D HOVER PHYSICS
+        // 1. MAGNETIC CURSOR & LIGHTBOX UX
         // ==========================================
         const cursor = document.getElementById('cursor');
         const trail = document.getElementById('cursor-trail');
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
         let trailX = mouseX, trailY = mouseY;
 
         document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
 
         function animateCursor() {
             cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
-            trailX += (mouseX - trailX) * 0.15; trailY += (mouseY - trailY) * 0.15;
+            trailX += (mouseX - trailX) * 0.2; trailY += (mouseY - trailY) * 0.2;
             trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
             requestAnimationFrame(animateCursor);
         }
         animateCursor();
 
-        // Holographic 3D Tilt for Photos
+        // 3D Tilt for Photo Frames
         document.querySelectorAll('.frame').forEach(frame => {
             frame.addEventListener('mousemove', (e) => {
                 const rect = frame.getBoundingClientRect();
                 const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const centerX = rect.width / 2; const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -15; // Max 15 deg tilt
-                const rotateY = ((x - centerX) / centerX) * 15;
+                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -12;
+                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 12;
                 frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
                 
                 cursor.style.transform = 'translate(-50%, -50%) scale(0)';
                 trail.style.transform = 'translate(-50%, -50%) scale(2.5)';
-                trail.style.borderColor = '#fff'; trail.style.background = 'rgba(255,255,255,0.1)';
+                trail.style.background = 'rgba(255,255,255,0.05)'; trail.style.borderColor = '#fff';
             });
             frame.addEventListener('mouseleave', () => {
                 frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
                 cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 trail.style.transform = 'translate(-50%, -50%) scale(1)';
-                trail.style.borderColor = 'rgba(0, 100, 177, 0.9)'; trail.style.background = 'transparent';
+                trail.style.background = 'transparent'; trail.style.borderColor = 'rgba(0, 100, 177, 0.9)';
             });
         });
 
+        // LIGHTBOX ENGINE
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        document.querySelectorAll('.photo-inner').forEach(photo => {
+            photo.addEventListener('click', () => {
+                const bgUrl = photo.style.backgroundImage;
+                lightboxImg.style.backgroundImage = bgUrl;
+                lightbox.classList.add('active');
+                document.body.style.overflowY = 'hidden'; // Stop scrolling while viewing
+            });
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            document.body.style.overflowY = 'auto';
+        });
+
         // ==========================================
-        // THREE.JS: ZERO-MODEL QUANTUM WORLD
+        // 2. THREE.JS: THE DIAMOND GLASS PHYSICS
         // ==========================================
         const canvas = document.querySelector('#webgl-canvas');
-        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x010103, 0.02);
-
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 300);
-        camera.position.z = 25;
+        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020204, 0.015);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 300);
+        camera.position.z = 30;
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Lighting for Glass
-        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
-        const blueLight = new THREE.PointLight(0x0064B1, 8, 100); blueLight.position.set(-10, 10, 5); scene.add(blueLight);
-        const whiteLight = new THREE.PointLight(0xffffff, 4, 100); whiteLight.position.set(10, -10, 5); scene.add(whiteLight);
+        // Premium Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+        const blueLight = new THREE.PointLight(0x0064B1, 10, 100); blueLight.position.set(-15, 10, 5); scene.add(blueLight);
+        const whiteLight = new THREE.PointLight(0xffffff, 5, 100); whiteLight.position.set(15, -15, 5); scene.add(whiteLight);
 
-        // --- PROCEDURAL QUANTUM CAP (No external file needed) ---
-        const quantumGroup = new THREE.Group();
-        
-        // Advanced Frosted Glass Material
+        // Heavy Crystal Glass Material
         const glassMat = new THREE.MeshPhysicalMaterial({
-            color: 0x0064B1, metalness: 0.1, roughness: 0.2, transmission: 0.9, thickness: 1.5,
-            clearcoat: 1.0, clearcoatRoughness: 0.1, wireframe: false
+            color: 0x004a8c, metalness: 0.2, roughness: 0.1, transmission: 0.95, thickness: 2.5,
+            clearcoat: 1.0, clearcoatRoughness: 0.1, ior: 1.5, side: THREE.DoubleSide
         });
-        
-        // Glowing Wireframe Edge Material
-        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
 
-        // 1. The Mortarboard (Top)
-        const boardGeo = new THREE.BoxGeometry(6, 0.1, 6);
+        const quantumGroup = new THREE.Group();
+        const boardGeo = new THREE.BoxGeometry(7, 0.2, 7);
         const board = new THREE.Mesh(boardGeo, glassMat);
-        const boardEdges = new THREE.LineSegments(new THREE.EdgesGeometry(boardGeo), edgeMat);
-        board.add(boardEdges);
+        board.add(new THREE.LineSegments(new THREE.EdgesGeometry(boardGeo), edgeMat));
 
-        // 2. The Skullcap (Base)
-        const capGeo = new THREE.CylinderGeometry(2, 2.5, 2, 32);
+        const capGeo = new THREE.CylinderGeometry(2.5, 3, 2.5, 32);
         const baseCap = new THREE.Mesh(capGeo, glassMat);
-        const capEdges = new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat);
-        baseCap.add(capEdges);
-        baseCap.position.y = -1;
+        baseCap.add(new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat));
+        baseCap.position.y = -1.2;
 
         quantumGroup.add(board, baseCap);
-        quantumGroup.position.set(5, -2, -5); // Start position
+        quantumGroup.position.set(7, -3, -5); 
         scene.add(quantumGroup);
 
-        // --- DYNAMIC KINETIC RINGS ---
-        const rings = [];
-        for(let i=0; i<3; i++) {
-            const ringGeo = new THREE.TorusGeometry(8 + (i*1.5), 0.02, 16, 100);
-            const ringMat = new THREE.MeshBasicMaterial({ color: i%2===0 ? 0x0064B1 : 0xffffff, transparent: true, opacity: 0.5 });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.random() * Math.PI;
-            ring.rotation.y = Math.random() * Math.PI;
-            scene.add(ring);
-            rings.push({ mesh: ring, speedX: Math.random()*0.01, speedY: Math.random()*0.01 });
-        }
-
-        // --- PARTICLE VORTEX ---
-        const pCount = 6000;
+        // Vortex Particles
         const pGeo = new THREE.BufferGeometry();
-        const pPos = new Float32Array(pCount * 3);
-        for(let i=0; i<pCount*3; i+=3){
-            let r = 20 + Math.random() * 60, theta = Math.random() * Math.PI * 2, phi = Math.acos((Math.random() * 2) - 1);
-            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 30;
+        const pPos = new Float32Array(8000 * 3);
+        for(let i=0; i<8000*3; i+=3){
+            let r = 25 + Math.random() * 80, theta = Math.random() * Math.PI*2, phi = Math.acos((Math.random()*2)-1);
+            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 40;
         }
         pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-        const pMat = new THREE.PointsMaterial({ size: 0.15, color: 0x0064B1, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        const pMat = new THREE.PointsMaterial({ size: 0.12, color: 0x0064B1, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
         const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
 
-        // --- INTERACTIVE EXPLOSION ON CLICK ---
-        window.addEventListener('click', () => {
-            gsap.to(pMat, { size: 0.5, opacity: 1, duration: 0.2, yoyo: true, repeat: 1 });
-            gsap.to(vortex.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.5, yoyo: true, repeat: 1, ease: "power4.out" });
-        });
-
-        // --- POST-PROCESSING EPIC BLOOM ---
+        // Epic Bloom
         const renderScene = new THREE.RenderPass(scene, camera);
-        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2.0, 0.5, 0.85);
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85);
         const composer = new THREE.EffectComposer(renderer);
         composer.addPass(renderScene); composer.addPass(bloomPass);
 
-        // --- PRELOADER SEQUENCE ---
+        // ==========================================
+        // 3. BOOT SEQUENCE & GSAP ANIMATIONS
+        // ==========================================
         let loadProgress = 0;
         const fakeLoad = setInterval(() => {
-            loadProgress += Math.random() * 8;
+            loadProgress += Math.random() * 12;
             if(loadProgress >= 100) {
                 clearInterval(fakeLoad); loadProgress = 100;
                 document.getElementById('enter-btn').classList.add('ready');
-                document.getElementById('load-text').innerHTML = "SYSTEM READY: PROCEED";
+                document.getElementById('load-text').innerHTML = "SYSTEM READY";
             }
             document.getElementById('percent').innerText = Math.floor(loadProgress);
-            document.getElementById('progress').style.width = loadProgress + '%';
         }, 100);
 
         document.getElementById('enter-btn').addEventListener('click', () => {
-            gsap.to('#preloader', { yPercent: -100, duration: 1.5, ease: "power4.inOut" });
-            document.body.style.overflowY = 'auto';
+            // Vault Open Effect
+            gsap.to('#preloader', { scale: 3, opacity: 0, filter: "blur(20px)", duration: 1.5, ease: "power4.inOut", onComplete: () => {
+                document.getElementById('preloader').style.display = 'none';
+                document.body.style.overflowY = 'auto';
+            }});
             gsap.to('main', { opacity: 1, duration: 2, delay: 0.5 });
-            
-            // Audio Start
-            const audio = document.getElementById('bgm');
-            audio.volume = 0.4; audio.play().catch(e => console.log("Audio ready."));
-
-            // Intro Animations
-            gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 1 });
+            document.getElementById('bgm').volume = 0.5; document.getElementById('bgm').play().catch(e=>{});
+            gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
         });
 
-        // ==========================================
-        // SCROLL PHYSICS & CIPHER TEXT REVEAL
-        // ==========================================
-        
-        // Scroll the Quantum Cap
+        // Center-Snap Parallax Logic
+        // The frames offset dynamically based on scroll, but perfectly align when centered
         const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });
-        capTl.to(quantumGroup.position, { x: -6, y: 2, z: 5 }, 0).to(quantumGroup.rotation, { x: Math.PI/2, y: Math.PI }, 0)
-             .to(board.position, { y: 3 }, 0) /* Board floats off the cap */
-             .to(quantumGroup.position, { x: 6, y: -2, z: 10 }, 0.4).to(quantumGroup.rotation, { x: 0, y: Math.PI*2 }, 0.4)
-             .to(board.position, { y: 0 }, 0.4) /* Board snaps back */
-             .to(quantumGroup.position, { x: 0, y: 0, z: -5 }, 0.8).to(quantumGroup.rotation, { x: 0.2, y: Math.PI*4 }, 0.8);
+        capTl.to(quantumGroup.position, { x: -8, y: 3, z: 2 }, 0).to(quantumGroup.rotation, { x: Math.PI/1.5, y: Math.PI }, 0)
+             .to(board.position, { y: 4 }, 0).to(quantumGroup.position, { x: 8, y: -2, z: 8 }, 0.4).to(quantumGroup.rotation, { x: -0.2, y: Math.PI*2 }, 0.4)
+             .to(board.position, { y: 0 }, 0.4).to(quantumGroup.position, { x: 0, y: 0, z: -8 }, 0.8).to(quantumGroup.rotation, { x: 0.3, y: Math.PI*4 }, 0.8);
 
-        // Cipher Text Decode Function
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         function decodeText(element) {
-            const originalText = element.getAttribute('data-text');
-            let iterations = 0;
-            const interval = setInterval(() => {
-                element.innerText = originalText.split("").map((letter, index) => {
-                    if(index < iterations) return originalText[index];
-                    return letters[Math.floor(Math.random() * 26)];
-                }).join("");
-                if(iterations >= originalText.length) clearInterval(interval);
-                iterations += 1/3;
+            if(element.decoded) return; element.decoded = true;
+            const original = element.getAttribute('data-text'); let iter = 0;
+            const int = setInterval(() => {
+                element.innerText = original.split("").map((l, i) => i < iter ? original[i] : letters[Math.floor(Math.random()*36)]).join("");
+                if(iter >= original.length) clearInterval(int); iter += 1/3;
             }, 30);
         }
 
-        const chapters = gsap.utils.toArray('.chapter-trigger');
-        chapters.forEach((chapter) => {
+        document.querySelectorAll('.chapter-trigger').forEach((chapter) => {
             const block = chapter.querySelector('.poem-block');
             const cipher = chapter.querySelector('.cipher-text');
             const frames = chapter.querySelectorAll('.frame');
 
-            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 70%" } });
-
-            if(block) tl.fromTo(block, { scale: 0.8, opacity: 0, rotationX: 20 }, { scale: 1, opacity: 1, rotationX: 0, duration: 1.5, ease: "expo.out" });
-            
-            // Trigger Cipher effect when scrolled into view
+            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 75%" } });
+            if(block) tl.fromTo(block, { scale: 0.85, opacity: 0, y: 50 }, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: "expo.out" });
             ScrollTrigger.create({ trigger: chapter, start: "top 70%", onEnter: () => decodeText(cipher) });
 
             if(frames.length) {
-                tl.fromTo(frames, 
-                    { y: 400, z: -1000, rotationX: 80, opacity: 0 },
-                    { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 2, stagger: 0.15, ease: "expo.out" }, "-=1.2"
-                );
+                // Initial entrance scatter
+                tl.fromTo(frames, { y: 200, z: -500, rotationX: 45, opacity: 0 }, { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=1");
+                
+                // Continuous Parallax linked to the center of the viewport
                 frames.forEach(frame => {
                     const speed = parseFloat(frame.getAttribute('data-speed'));
-                    gsap.to(frame, { y: () => -200 * speed, ease: "none", scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }});
+                    gsap.to(frame, {
+                        y: () => -100 * speed,
+                        ease: "none",
+                        scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }
+                    });
                 });
             }
         });
 
         // ==========================================
-        // RENDER ENGINE
+        // RENDER LOOP
         // ==========================================
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
-            
-            vortex.rotation.y = time * 0.03; vortex.rotation.x = time * 0.015;
-            
-            rings.forEach(r => { r.mesh.rotation.x += r.speedX; r.mesh.rotation.y += r.speedY; });
+            vortex.rotation.y = time * 0.02; vortex.rotation.x = time * 0.01;
             quantumGroup.position.y += Math.sin(time * 2) * 0.005;
 
-            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 8 - camera.position.x) * 0.05;
-            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 8 - camera.position.y) * 0.05;
+            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 6 - camera.position.x) * 0.05;
+            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 6 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
 
             composer.render();

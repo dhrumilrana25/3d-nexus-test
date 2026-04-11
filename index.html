@@ -19,6 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
+        /* --- GOD TIER VARIABLES --- */
         :root { --uta-blue: #0064B1; --uta-glow: rgba(0, 100, 177, 0.9); --black: #020204; --white: #ffffff; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
@@ -67,14 +68,13 @@
             max-width: 900px; width: 100%; background: rgba(8, 8, 12, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding: clamp(50px, 8vw, 80px) clamp(20px, 5vw, 60px); box-shadow: 0 40px 80px rgba(0,0,0,0.8); text-align: center; border-radius: 4px; transition: border-color 1s, box-shadow 1s;
-            margin-bottom: 15vh; /* Huge gap before timeline starts */
+            margin-bottom: 15vh;
         }
         
         .chap-num { font-size: 1rem; letter-spacing: 8px; color: var(--white); display: block; margin-bottom: 15px; font-weight: 600; text-shadow: 0 0 10px rgba(255,255,255,0.5); transition: color 1s, text-shadow 1s; }
         .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 30px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 20px rgba(0,0,0,0.5); line-height: 1.1; }
         .poem-text { font-size: clamp(1.2rem, 2.5vw, 1.6rem); line-height: 2.4; color: #e0e0e0; font-weight: 300; font-style: italic; overflow: hidden; }
 
-        /* The Vertical Line */
         .timeline { position: relative; width: 100%; display: flex; flex-direction: column; gap: 15vh; padding: 5vh 0 20vh 0; }
         .timeline::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3) 10%, rgba(255,255,255,0.3) 90%, transparent); transform: translateX(-50%); z-index: 0; }
 
@@ -82,15 +82,9 @@
         .timeline-item.left { justify-content: flex-start; padding-right: 55%; }
         .timeline-item.right { justify-content: flex-end; padding-left: 55%; }
 
-        /* Glowing dot on the timeline */
-        .timeline-item::before {
-            content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 50%;
-            background: var(--white); box-shadow: 0 0 20px var(--white); transform: translate(-50%, -50%); z-index: 2;
-            opacity: 0.2; transition: opacity 0.5s;
-        }
+        .timeline-item::before { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--white); box-shadow: 0 0 20px var(--white); transform: translate(-50%, -50%); z-index: 2; opacity: 0.2; transition: opacity 0.5s; }
         .timeline-item.active-dot::before { opacity: 1; box-shadow: 0 0 30px var(--uta-glow), 0 0 10px var(--white); }
 
-        /* Mobile Timeline Fix */
         @media (max-width: 900px) {
             .timeline::before { left: 10%; }
             .timeline-item.left, .timeline-item.right { justify-content: flex-end; padding: 0 0 0 20%; }
@@ -106,19 +100,24 @@
         .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.2) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
 
+        /* --- LIGHTBOX --- */
         #lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.98); backdrop-filter: blur(30px); z-index: 100000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
         #lightbox.active { opacity: 1; pointer-events: all; }
         #lightbox-img { max-width: 90%; max-height: 90%; width: auto; height: auto; border-radius: 4px; box-shadow: 0 0 100px rgba(255,255,255, 0.2); transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: contain; background-repeat: no-repeat; background-position: center; }
         #lightbox.active #lightbox-img { transform: scale(1); width: 85vw; height: 85vh; }
         .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; color: #fff; opacity: 0.4; transition: 0.3s; padding: 20px; font-family: sans-serif; cursor: pointer !important; }
-        .close-btn:hover { opacity: 1; transform: rotate(90deg); }
+        .close-btn:hover { opacity: 1; transform: rotate(90deg); color: #fff; }
 
-        /* The Finale Button */
+        /* --- FINALE THEATER --- */
         .finale-btn-wrap { display: flex; justify-content: center; width: 100%; padding-top: 10vh; }
         .finale-btn { padding: 25px 60px; font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--white); background: transparent; border: 1px solid rgba(255,255,255,0.3); letter-spacing: 5px; text-transform: uppercase; position: relative; overflow: hidden; transition: 0.5s; box-shadow: 0 0 20px rgba(255,255,255,0); }
         .finale-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
         .finale-btn:hover { border-color: var(--white); box-shadow: 0 0 40px rgba(255,255,255,0.3); transform: scale(1.05); }
         .finale-btn:hover::before { left: 100%; }
+
+        #video-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 200000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; }
+        #video-modal.active { opacity: 1; pointer-events: all; }
+        #finale-video { width: 90vw; max-width: 1200px; border-radius: 8px; box-shadow: 0 0 100px rgba(0, 100, 177, 0.8); outline: none; background: #000; }
 
     </style>
 </head>
@@ -139,7 +138,15 @@
         <button id="enter-btn">ENTER THE JOURNEY</button>
     </div>
 
-    <div id="lightbox"><div class="close-btn interactable">✕</div><div id="lightbox-img"></div></div>
+    <div id="lightbox"><div class="close-btn interactable" id="close-lightbox">✕</div><div id="lightbox-img"></div></div>
+
+    <div id="video-modal">
+        <div class="close-btn interactable" id="close-video">✕</div>
+        <video id="finale-video" controls>
+            <source src="yashu_memories.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
 
     <canvas id="webgl-canvas"></canvas>
 
@@ -228,7 +235,7 @@
             <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center; margin-bottom: 5vh;">Happy Graduation, Yashu!</h1>
             <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
                 <h2 class="chapter-title scramble-title"><span class="chap-num">FINALE</span>The Maverick: UTA '26</h2>
-                <p class="poem-text scrub-text" style="text-align: center;">UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand.</p>
+                <p class="poem-text scrub-text" style="text-align: center;">UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Sattu, with energy so grand, Emptiness gone where you now stand.</p>
             </div>
             <div class="timeline">
                 <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div></div>
@@ -282,9 +289,10 @@
             else { bgMusic.play(); audioBtn.classList.remove('muted'); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>'; }
         });
 
+        // Lightbox Logic
         const lightbox = document.getElementById('lightbox'); const lightboxImg = document.getElementById('lightbox-img');
         document.querySelectorAll('.photo-inner').forEach(photo => { photo.addEventListener('click', () => { lightboxImg.style.backgroundImage = photo.style.backgroundImage; lightbox.classList.add('active'); document.body.style.overflowY = 'hidden'; }); });
-        lightbox.addEventListener('click', () => { lightbox.classList.remove('active'); document.body.style.overflowY = 'auto'; });
+        document.getElementById('close-lightbox').addEventListener('click', () => { lightbox.classList.remove('active'); document.body.style.overflowY = 'auto'; });
 
         // Scroll Physics
         let scrollVelocity = 0; let lastY = window.scrollY;
@@ -292,10 +300,7 @@
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             document.getElementById('scroll-progress').style.width = (winScroll / height) * 100 + "%";
-            
-            // Track Speed for Warp Drive effect
-            scrollVelocity = Math.abs(window.scrollY - lastY);
-            lastY = window.scrollY;
+            scrollVelocity = Math.abs(window.scrollY - lastY); lastY = window.scrollY;
         });
 
         // ==========================================
@@ -362,34 +367,45 @@
         }
 
         document.querySelectorAll('.chapter-section').forEach((chapter) => {
-            const block = chapter.querySelector('.poem-block');
-            const words = chapter.querySelectorAll('.scrub-text span');
-            const timelineItems = chapter.querySelectorAll('.timeline-item');
-
-            // Float up the text box
+            const block = chapter.querySelector('.poem-block'); const words = chapter.querySelectorAll('.scrub-text span'); const timelineItems = chapter.querySelectorAll('.timeline-item');
             gsap.fromTo(block, { scale: 0.9, opacity: 0, y: 50 }, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: "expo.out", scrollTrigger: { trigger: chapter, start: "top 80%" } });
-            
-            // Scrub the text based on scrolling
             gsap.to(words, { opacity: 1, stagger: 0.1, scrollTrigger: { trigger: block, start: "top 70%", end: "bottom 50%", scrub: 1 } });
-
-            // Animate Timeline Items left/right
             timelineItems.forEach(item => {
                 const isLeft = item.classList.contains('left');
-                gsap.fromTo(item.querySelector('.frame'), 
-                    { x: isLeft ? -100 : 100, opacity: 0, rotationY: isLeft ? -20 : 20 },
-                    { x: 0, opacity: 1, rotationY: 0, duration: 1.2, ease: "back.out(1.2)", scrollTrigger: { trigger: item, start: "top 80%" } }
-                );
-                // Trigger the glowing dot connection
+                gsap.fromTo(item.querySelector('.frame'), { x: isLeft ? -100 : 100, opacity: 0, rotationY: isLeft ? -20 : 20 }, { x: 0, opacity: 1, rotationY: 0, duration: 1.2, ease: "back.out(1.2)", scrollTrigger: { trigger: item, start: "top 80%" } });
                 ScrollTrigger.create({ trigger: item, start: "center 60%", onEnter: () => item.classList.add('active-dot'), onLeaveBack: () => item.classList.remove('active-dot') });
             });
         });
 
+        // ==========================================
+        // FINALE THEATER LOGIC
+        // ==========================================
         function triggerFinale() {
             gsap.to('.finale-btn', { scale: 0, opacity: 0, duration: 0.5 });
             gsap.to(vortex.scale, { x: 5, y: 5, z: 5, duration: 3, ease: "power2.in" });
             gsap.to(quantumGroup.position, { z: 50, duration: 3, ease: "power2.in" });
-            setTimeout(() => { alert("This is where the future begins, Yashu. \n(Dhrumil, you can link this button to a special video or another page!)"); }, 2000);
+            gsap.to(bgMusic, { volume: 0, duration: 2 });
+            
+            setTimeout(() => { 
+                bgMusic.pause(); 
+                const videoModal = document.getElementById('video-modal');
+                const video = document.getElementById('finale-video');
+                videoModal.classList.add('active'); 
+                video.play(); 
+            }, 2500);
         }
+
+        document.getElementById('close-video').addEventListener('click', () => {
+            const videoModal = document.getElementById('video-modal');
+            const video = document.getElementById('finale-video');
+            video.pause();
+            videoModal.classList.remove('active');
+            
+            if(!isMuted) {
+                bgMusic.play();
+                gsap.to(bgMusic, { volume: 0.5, duration: 2 });
+            }
+        });
 
         // ==========================================
         // RENDER LOOP & WARP PHYSICS
@@ -398,24 +414,16 @@
         function animate() {
             requestAnimationFrame(animate); const time = clock.getElapsedTime();
             
-            // Audio Reactivity
             let bassScale = 1; if (isAudioInit && !isMuted) { analyser.getByteFrequencyData(dataArray); let bass = 0; for(let i=0; i<10; i++) bass += dataArray[i]; bassScale = 1 + (bass/2550)*0.3; }
 
-            // Warp Drive Kinetic Physics
-            scrollVelocity *= 0.9; // Friction decay
-            const speedFactor = 1 + (scrollVelocity * 0.05);
-            
-            vortex.scale.set(bassScale, bassScale, bassScale * speedFactor); // Particles stretch on Z axis when scrolling
-            pMat.size = 0.15 + (scrollVelocity * 0.005); // Glow brighter when scrolling
-
+            scrollVelocity *= 0.9; const speedFactor = 1 + (scrollVelocity * 0.05);
+            vortex.scale.set(bassScale, bassScale, bassScale * speedFactor); pMat.size = 0.15 + (scrollVelocity * 0.005);
             rings.forEach((r, i) => { r.scale.set(bassScale, bassScale, bassScale); r.rotation.x += 0.01*(i+1); r.rotation.y += 0.02*(i+1); });
             
             vortex.rotation.y = time * 0.015; vortex.rotation.x = time * 0.005;
-            vortex.position.z += scrollVelocity * 0.1; // Push particles back slightly when scrolling for 3D depth
-            if(vortex.position.z > 20) vortex.position.z = 0; // Reset loop
+            vortex.position.z += scrollVelocity * 0.1; if(vortex.position.z > 20) vortex.position.z = 0;
 
-            quantumGroup.position.y += Math.sin(time*2)*0.005;
-            quantumGroup.rotation.y += scrollVelocity * 0.001; // Cap spins faster when scrolling
+            quantumGroup.position.y += Math.sin(time*2)*0.005; quantumGroup.rotation.y += scrollVelocity * 0.001;
 
             if (!isTouch) { camera.position.x += ((mouseX/window.innerWidth - 0.5)*6 - camera.position.x)*0.05; camera.position.y += (-(mouseY/window.innerHeight - 0.5)*6 - camera.position.y)*0.05; }
             camera.lookAt(scene.position); composer.render();

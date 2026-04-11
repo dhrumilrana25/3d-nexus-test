@@ -96,17 +96,28 @@
         .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; }
         .parallax-wrap { will-change: transform; }
 
+        /* BUG FIX: Removed preserve-3d to stop browser rendering engine from hiding the photos */
         .frame {
             width: clamp(260px, 25vw, 320px); height: clamp(340px, 33vw, 420px); 
             border-radius: 8px; padding: 12px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px rgba(0,0,0,0.7);
-            transform-style: preserve-3d; transition: border 0.4s ease; position: relative;
+            transition: border 0.4s ease; position: relative;
         }
         .frame:hover { border-color: rgba(0, 100, 177, 0.8); z-index: 50; }
         
-        .photo-inner { width: 100%; height: 100%; border-radius: 4px; background-size: cover; background-position: center; filter: grayscale(60%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); transform: translateZ(20px); position: relative; overflow: hidden; }
-        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); }
+        /* BUG FIX: Added background-color #111 fallback, background-repeat, and removed translateZ to guarantee rendering */
+        .photo-inner { 
+            width: 100%; height: 100%; border-radius: 4px; 
+            background-color: #111; 
+            background-size: cover; background-position: center; background-repeat: no-repeat; 
+            filter: grayscale(60%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+            position: relative; overflow: hidden; 
+        }
+        .frame:hover .photo-inner { 
+            filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); 
+            transform: scale(1.03); /* Beautiful subtle pop instead of Z-axis push */
+        }
 
         .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
@@ -272,7 +283,6 @@
             animateCursor();
         }
 
-        // Custom Hover State for specific elements
         document.querySelectorAll('.interactable').forEach(el => {
             el.addEventListener('mouseenter', () => {
                 if(isTouch) return;
@@ -288,19 +298,19 @@
             });
         });
 
-        // 3D Tilt for Photos
+        // 3D Tilt BUG FIX: Tilt applied to entire flat frame securely, no preserve-3d clipping
         document.querySelectorAll('.frame').forEach(frame => {
             frame.addEventListener('mousemove', (e) => {
                 if (isTouch) return;
                 const rect = frame.getBoundingClientRect();
                 const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -15;
-                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 15;
-                frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -12;
+                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 12;
+                frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
             });
             frame.addEventListener('mouseleave', () => {
                 if (isTouch) return;
-                frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
             });
         });
 
@@ -418,22 +428,17 @@
             bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
             gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
             
-            // Trigger ambient floating for frames right after load
             initAmbientFloat();
         });
 
-        // Ambient breathing float for all frames
+        // Ambient breathing float for frames safely applied to parallax wrapper
         function initAmbientFloat() {
-            gsap.utils.toArray('.frame').forEach(frame => {
-                gsap.to(frame, {
-                    y: `+=${Math.random() * 12 - 6}`,
+            gsap.utils.toArray('.parallax-wrap').forEach(wrap => {
+                gsap.to(wrap, {
                     x: `+=${Math.random() * 8 - 4}`,
                     rotationZ: Math.random() * 2 - 1,
                     duration: Math.random() * 2 + 3,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: "sine.inOut",
-                    delay: Math.random() * 2
+                    yoyo: true, repeat: -1, ease: "sine.inOut", delay: Math.random() * 2
                 });
             });
         }

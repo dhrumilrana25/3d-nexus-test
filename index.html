@@ -39,12 +39,15 @@
         #cursor { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.2s; }
         #cursor-trail { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--uta-blue); box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.1s ease-out; }
 
+        /* Disable custom cursor on touch devices */
+        @media (pointer: coarse) { * { cursor: auto !important; } #cursor, #cursor-trail { display: none !important; } }
+
         /* --- VAULT PRELOADER --- */
         #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; perspective: 1000px; }
         .core { width: 60px; height: 60px; border: 2px solid var(--uta-blue); transform: rotate(45deg); animation: pulse-core 2s infinite ease-in-out; margin-bottom: 40px; box-shadow: 0 0 30px var(--uta-glow); }
         @keyframes pulse-core { 0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.8; } 50% { transform: rotate(45deg) scale(1.2); opacity: 1; box-shadow: 0 0 50px var(--uta-glow), inset 0 0 20px var(--uta-glow); } }
         
-        #load-text { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 12px; color: #888; margin-bottom: 30px; text-transform: uppercase; }
+        #load-text { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 12px; color: #888; margin-bottom: 30px; text-transform: uppercase; text-align: center; }
         #enter-btn { padding: 15px 60px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 5px; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.5s; pointer-events: none; text-transform: uppercase; }
         #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; border-color: var(--uta-blue); }
         #enter-btn.ready:hover { background: rgba(0, 100, 177, 0.2); box-shadow: 0 0 40px var(--uta-glow) inset, 0 0 20px var(--uta-glow); }
@@ -56,9 +59,9 @@
         main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
         .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
 
-        .hero { justify-content: center; text-align: center; height: 100vh; }
-        .hero h1 { font-family: 'Cinzel', serif; font-size: 7.5rem; letter-spacing: 6px; line-height: 1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; }
-        .hero h2 { font-size: 2.2rem; font-weight: 200; font-style: italic; letter-spacing: 4px; color: #ccc; }
+        .hero { justify-content: center; text-align: center; height: 100vh; flex-direction: column; }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 7.5rem); letter-spacing: 6px; line-height: 1.1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; }
+        .hero h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 200; font-style: italic; letter-spacing: 4px; color: #ccc; }
         .scroll-down { position: absolute; bottom: 5vh; font-size: 0.8rem; letter-spacing: 8px; animation: pulse-text 2s infinite; opacity: 0.4; }
         @keyframes pulse-text { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; text-shadow: 0 0 10px var(--white); } }
 
@@ -66,24 +69,28 @@
         .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 6vh; z-index: 2; align-items: center; }
         
         .poem-block {
-            max-width: 800px; background: rgba(8, 8, 12, 0.4);
+            max-width: 800px; width: 100%; background: rgba(8, 8, 12, 0.4);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 50px 60px; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            padding: clamp(30px, 5vw, 50px) clamp(20px, 5vw, 60px); 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
             text-align: center; border-radius: 4px;
         }
-        .chapter-title { font-family: 'Cinzel', serif; font-size: 3.5rem; margin-bottom: 20px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .poem-text { font-size: 1.3rem; line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 20px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .poem-text { font-size: clamp(1rem, 2vw, 1.3rem); line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
 
-        /* The Aligned Grid System */
         .gallery { 
             display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; 
             width: 100%; max-width: 1400px; perspective: 2000px;
             padding: 40px 0;
         }
 
+        /* Parallax wrapper completely isolates scrolling physics from hover physics */
+        .parallax-wrap { will-change: transform; }
+
         .frame {
-            width: 320px; height: 420px; border-radius: 8px; padding: 12px;
+            width: clamp(260px, 25vw, 320px); height: clamp(340px, 33vw, 420px); 
+            border-radius: 8px; padding: 12px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px rgba(0,0,0,0.7);
             transform-style: preserve-3d; transition: border 0.4s ease;
@@ -104,19 +111,19 @@
         /* --- FULLSCREEN LIGHTBOX --- */
         #lightbox {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
             z-index: 100000; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
         #lightbox.active { opacity: 1; pointer-events: all; }
         #lightbox-img {
             max-width: 90%; max-height: 90%; width: auto; height: auto;
-            border-radius: 8px; box-shadow: 0 0 60px rgba(0, 100, 177, 0.6);
+            border-radius: 8px; box-shadow: 0 0 80px rgba(0, 100, 177, 0.8);
             transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background-size: contain; background-repeat: no-repeat; background-position: center;
         }
-        #lightbox.active #lightbox-img { transform: scale(1); width: 80vw; height: 80vh; }
-        .close-btn { position: absolute; top: 40px; right: 50px; font-size: 2rem; color: #fff; opacity: 0.6; transition: 0.3s; padding: 20px; }
+        #lightbox.active #lightbox-img { transform: scale(1); width: 85vw; height: 85vh; }
+        .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; color: #fff; opacity: 0.6; transition: 0.3s; padding: 20px; font-family: sans-serif; cursor: pointer !important; }
         .close-btn:hover { opacity: 1; transform: rotate(90deg); color: var(--uta-blue); }
 
     </style>
@@ -130,7 +137,7 @@
 
     <div id="preloader">
         <div class="core"></div>
-        <div id="load-text">CALIBRATING MEMORIES... <span id="percent">0</span>%</div>
+        <div id="load-text">CALIBRATING MEMORIES... <br><span id="percent" style="font-size: 2rem; color: var(--white);">0</span>%</div>
         <button id="enter-btn">ENTER THE JOURNEY</button>
     </div>
 
@@ -157,10 +164,10 @@
                     <p class="poem-text cipher-text" data-text="A little bundle, full of zest, Making the nursery the very best. Surrounded by joy, completeness from the start, Yashu's energy captured every heart."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-0.5"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.5"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -172,9 +179,9 @@
                     <p class="poem-text cipher-text" data-text="Laughter echoes, world so bright, Playing and growing in pure delight. With pigtails bouncing, your presence so sweet, Every childhood scene you made complete."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1.2"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.5"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -186,10 +193,10 @@
                     <p class="poem-text cipher-text" data-text="Teenage spark, vibrant and wild, Your inner bloom, never mild. Rebellious spirit, heart ablaze, Making surroundings shine in distinct ways."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="-0.8"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch3_pic4.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic4.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -201,9 +208,9 @@
                     <p class="poem-text cipher-text" data-text="Soaring high, chasing each dream, A radiant presence, a perfect team. You make the world seem complete and whole, With energy filling every role."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-0.9"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -215,31 +222,31 @@
                     <p class="poem-text cipher-text" data-text="A chosen family, a circle so bright, Filling the days and the longest of nights. With every shared secret and memories made, A beautiful bond that will never fade."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1.2"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-0.6"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.4"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1.3"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="0.7"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-0.9"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.7"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="0.7"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
 
         <section class="panel chapter-trigger" style="padding-bottom: 25vh;">
             <div class="chapter-container">
-                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: 6rem; text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
+                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
                 <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
                     <h2 class="chapter-title scramble-title">The Maverick: UTA '26</h2>
                     <p class="poem-text cipher-text" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="-1"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div></div>
+                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div></div>
                 </div>
             </div>
         </section>
@@ -256,23 +263,28 @@
         let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
         let trailX = mouseX, trailY = mouseY;
 
-        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        // Check if device is touch screen
+        const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
-        function animateCursor() {
-            cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
-            trailX += (mouseX - trailX) * 0.2; trailY += (mouseY - trailY) * 0.2;
-            trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
-            requestAnimationFrame(animateCursor);
+        if (!isTouch) {
+            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+            function animateCursor() {
+                cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
+                trailX += (mouseX - trailX) * 0.2; trailY += (mouseY - trailY) * 0.2;
+                trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
         }
-        animateCursor();
 
-        // 3D Tilt for Photo Frames
+        // 3D Tilt for Photo Frames (Applied to inner frame, preventing parallax clash)
         document.querySelectorAll('.frame').forEach(frame => {
             frame.addEventListener('mousemove', (e) => {
+                if (isTouch) return;
                 const rect = frame.getBoundingClientRect();
                 const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -12;
-                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 12;
+                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -15;
+                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 15;
                 frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
                 
                 cursor.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -280,6 +292,7 @@
                 trail.style.background = 'rgba(255,255,255,0.05)'; trail.style.borderColor = '#fff';
             });
             frame.addEventListener('mouseleave', () => {
+                if (isTouch) return;
                 frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
                 cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 trail.style.transform = 'translate(-50%, -50%) scale(1)';
@@ -296,7 +309,7 @@
                 const bgUrl = photo.style.backgroundImage;
                 lightboxImg.style.backgroundImage = bgUrl;
                 lightbox.classList.add('active');
-                document.body.style.overflowY = 'hidden'; // Stop scrolling while viewing
+                document.body.style.overflowY = 'hidden'; 
             });
         });
 
@@ -313,11 +326,11 @@
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 300);
         camera.position.z = 30;
 
+        // Cap performance for high DPI screens to keep framerate smooth
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
-        // Premium Lighting
         scene.add(new THREE.AmbientLight(0xffffff, 0.3));
         const blueLight = new THREE.PointLight(0x0064B1, 10, 100); blueLight.position.set(-15, 10, 5); scene.add(blueLight);
         const whiteLight = new THREE.PointLight(0xffffff, 5, 100); whiteLight.position.set(15, -15, 5); scene.add(whiteLight);
@@ -343,15 +356,16 @@
         quantumGroup.position.set(7, -3, -5); 
         scene.add(quantumGroup);
 
-        // Vortex Particles
+        // Vortex Particles Optimized
         const pGeo = new THREE.BufferGeometry();
-        const pPos = new Float32Array(8000 * 3);
-        for(let i=0; i<8000*3; i+=3){
+        const particleCount = isTouch ? 3000 : 6000; // Less particles on mobile
+        const pPos = new Float32Array(particleCount * 3);
+        for(let i=0; i<particleCount*3; i+=3){
             let r = 25 + Math.random() * 80, theta = Math.random() * Math.PI*2, phi = Math.acos((Math.random()*2)-1);
             pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 40;
         }
         pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-        const pMat = new THREE.PointsMaterial({ size: 0.12, color: 0x0064B1, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+        const pMat = new THREE.PointsMaterial({ size: 0.15, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
         const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
 
         // Epic Bloom
@@ -385,13 +399,13 @@
             gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
         });
 
-        // Center-Snap Parallax Logic
-        // The frames offset dynamically based on scroll, but perfectly align when centered
+        // 3D Glass Scroll Physics
         const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });
         capTl.to(quantumGroup.position, { x: -8, y: 3, z: 2 }, 0).to(quantumGroup.rotation, { x: Math.PI/1.5, y: Math.PI }, 0)
              .to(board.position, { y: 4 }, 0).to(quantumGroup.position, { x: 8, y: -2, z: 8 }, 0.4).to(quantumGroup.rotation, { x: -0.2, y: Math.PI*2 }, 0.4)
              .to(board.position, { y: 0 }, 0.4).to(quantumGroup.position, { x: 0, y: 0, z: -8 }, 0.8).to(quantumGroup.rotation, { x: 0.3, y: Math.PI*4 }, 0.8);
 
+        // Cipher Matrix Text
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         function decodeText(element) {
             if(element.decoded) return; element.decoded = true;
@@ -405,20 +419,20 @@
         document.querySelectorAll('.chapter-trigger').forEach((chapter) => {
             const block = chapter.querySelector('.poem-block');
             const cipher = chapter.querySelector('.cipher-text');
-            const frames = chapter.querySelectorAll('.frame');
+            const parallaxWraps = chapter.querySelectorAll('.parallax-wrap'); // Target the wrapper for scroll physics!
 
             const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 75%" } });
             if(block) tl.fromTo(block, { scale: 0.85, opacity: 0, y: 50 }, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: "expo.out" });
             ScrollTrigger.create({ trigger: chapter, start: "top 70%", onEnter: () => decodeText(cipher) });
 
-            if(frames.length) {
+            if(parallaxWraps.length) {
                 // Initial entrance scatter
-                tl.fromTo(frames, { y: 200, z: -500, rotationX: 45, opacity: 0 }, { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=1");
+                tl.fromTo(parallaxWraps, { y: 200, z: -500, rotationX: 45, opacity: 0 }, { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=1");
                 
                 // Continuous Parallax linked to the center of the viewport
-                frames.forEach(frame => {
-                    const speed = parseFloat(frame.getAttribute('data-speed'));
-                    gsap.to(frame, {
+                parallaxWraps.forEach(wrap => {
+                    const speed = parseFloat(wrap.getAttribute('data-speed'));
+                    gsap.to(wrap, {
                         y: () => -100 * speed,
                         ease: "none",
                         scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }
@@ -437,8 +451,10 @@
             vortex.rotation.y = time * 0.02; vortex.rotation.x = time * 0.01;
             quantumGroup.position.y += Math.sin(time * 2) * 0.005;
 
-            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 6 - camera.position.x) * 0.05;
-            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 6 - camera.position.y) * 0.05;
+            if (!isTouch) {
+                camera.position.x += ((mouseX / window.innerWidth - 0.5) * 6 - camera.position.x) * 0.05;
+                camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 6 - camera.position.y) * 0.05;
+            }
             camera.lookAt(scene.position);
 
             composer.render();

@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yashu's UTA Graduation | Epic Journey</title>
+    <title>Yashu's Epic Journey | UTA '26</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -15,154 +13,156 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
     <style>
-        /* --- PREMIUM THEME & LAYOUT --- */
+        /* --- GLOBAL & LIQUID UI --- */
         :root {
             --uta-blue: #0064B1;
-            --uta-blue-glow: rgba(0, 100, 177, 0.6);
-            --black: #050508;
+            --uta-glow: rgba(0, 100, 177, 0.8);
+            --black: #020202;
             --white: #ffffff;
-            --font-head: 'Cinzel', serif;
-            --font-body: 'Montserrat', sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hides default cursor */ }
 
         body {
-            background-color: var(--black);
-            color: var(--white);
-            font-family: var(--font-body);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            background-color: var(--black); color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden; overflow-y: hidden; /* Locked until loaded */
         }
 
-        #webgl-canvas {
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); }
+
+        /* --- MAGNETIC CURSOR --- */
+        #cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border-radius: 50%; background: var(--white);
+            mix-blend-mode: difference; pointer-events: none; z-index: 10000;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+            transform: translate(-50%, -50%);
+        }
+        #cursor-trail {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+            border-radius: 50%; border: 1px solid var(--uta-glow);
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); transition: 0.1s ease-out;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0; pointer-events: none;
+            background: var(--black); z-index: 9000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-
-        main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
-
-        .panel {
-            min-height: 100vh; width: 100%; max-width: 1600px;
-            display: flex; align-items: center; padding: 15vh 5%;
-            position: relative;
+        #load-text { font-family: 'Cinzel', serif; font-size: 2rem; letter-spacing: 5px; color: var(--white); margin-bottom: 20px; }
+        .progress-bar { width: 300px; height: 2px; background: #222; position: relative; overflow: hidden; }
+        #progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--uta-blue); box-shadow: 0 0 20px var(--uta-glow); }
+        #enter-btn {
+            margin-top: 40px; padding: 15px 40px; border: 1px solid var(--uta-blue);
+            background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif;
+            letter-spacing: 3px; border-radius: 30px; opacity: 0; transform: translateY(20px);
+            transition: all 0.4s; pointer-events: none; cursor: none;
         }
+        #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; }
+        #enter-btn.ready:hover { background: var(--uta-blue); box-shadow: 0 0 30px var(--uta-glow); }
 
-        /* --- HERO SECTION --- */
-        .hero { justify-content: center; text-align: center; }
-        .hero-text h1 { 
-            font-family: var(--font-head); font-size: 6rem; font-weight: 700;
-            letter-spacing: 4px; line-height: 1.1; 
-            text-shadow: 0 0 40px var(--uta-blue-glow);
-            margin-bottom: 20px;
-        }
-        .hero-text .highlight { color: var(--uta-blue); }
-        .hero-text h2 { font-size: 2rem; font-style: italic; font-weight: 300; opacity: 0.8; }
-        .hero-text p { font-size: 1rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 8px; margin-top: 30px; }
+        /* --- 3D CANVAS --- */
+        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
 
-        /* --- GLASSMORPHISM CHAPTERS --- */
+        /* --- LAYOUT --- */
+        main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
+        .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
+
+        .hero { justify-content: center; text-align: center; height: 100vh; }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: 7rem; letter-spacing: 2px; line-height: 1; text-shadow: 0 0 50px var(--uta-glow); }
+        .hero h2 { font-size: 2.5rem; font-weight: 300; font-style: italic; opacity: 0.8; margin-top: 20px; }
+        .scroll-down { position: absolute; bottom: 50px; font-size: 0.9rem; letter-spacing: 5px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; text-shadow: 0 0 10px var(--white); } }
+
+        /* --- ULTIMATE GLASSMORPHISM --- */
         .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 60px; z-index: 2; }
         .panel:nth-child(even) .chapter-container { align-items: flex-end; text-align: right; }
         .panel:nth-child(odd) .chapter-container { align-items: flex-start; text-align: left; }
         .panel:last-child .chapter-container { align-items: center; text-align: center; }
 
         .poem-block {
-            max-width: 650px;
-            /* Fluent Glass Effect */
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 0 20px rgba(0, 100, 177, 0.1);
-            position: relative;
-            overflow: hidden;
+            max-width: 700px; background: rgba(10, 10, 15, 0.4);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 50px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 40px rgba(0, 100, 177, 0.15);
         }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: 3.5rem; margin-bottom: 20px; color: var(--white); }
+        .poem-text { font-size: 1.3rem; line-height: 2.2; color: #ccc; font-style: italic; overflow: hidden; }
 
-        /* Glowing edge highlight on glass */
-        .poem-block::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-            background: linear-gradient(to bottom, transparent, var(--uta-blue), transparent);
-        }
-        .panel:nth-child(even) .poem-block::before { left: auto; right: 0; }
-
-        .chapter-title { font-family: var(--font-head); color: var(--white); font-size: 3rem; margin-bottom: 20px; text-shadow: 0 0 20px rgba(0,0,0,0.8); }
-        .poem-text { font-size: 1.2rem; line-height: 2; color: #d0d0d0; font-style: italic; font-weight: 300; }
-
-        /* --- FLUENT PHOTO FRAMES --- */
-        .gallery {
-            display: flex; flex-wrap: wrap; gap: 30px;
-            justify-content: flex-start; max-width: 900px;
-            perspective: 1500px;
-        }
+        /* --- 3D FLOAT GALLERY --- */
+        .gallery { display: flex; flex-wrap: wrap; gap: 40px; max-width: 1000px; perspective: 2000px; }
         .panel:nth-child(even) .gallery { justify-content: flex-end; }
-        .panel:last-child .gallery, .friends-gallery { justify-content: center; max-width: 1400px; }
+        .panel:last-child .gallery { justify-content: center; max-width: 1400px; }
 
         .frame {
-            width: 260px; height: 340px;
-            border-radius: 12px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            cursor: pointer;
-            position: relative;
+            width: 280px; height: 380px; border-radius: 15px; padding: 12px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
-        .frame:hover {
-            transform: scale(1.05) translateY(-15px) !important;
-            border-color: rgba(0, 100, 177, 0.5);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px var(--uta-blue-glow);
-            z-index: 20;
+        .frame.hovered {
+            transform: scale(1.08) translateY(-20px) !important;
+            border-color: rgba(0, 100, 177, 0.8);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 50px var(--uta-glow); z-index: 50;
         }
-
         .photo {
-            width: 100%; height: 100%;
-            border-radius: 6px;
-            background-color: #111;
-            background-size: cover; background-position: center;
-            filter: grayscale(20%) contrast(1.1);
-            transition: filter 0.5s ease;
+            width: 100%; height: 100%; border-radius: 8px; background-size: cover; background-position: center;
+            filter: grayscale(40%) contrast(1.2); transition: filter 0.6s ease;
         }
-        .frame:hover .photo { filter: grayscale(0%) contrast(1.1); }
-
-        .congrats { font-family: var(--font-head); font-size: 5rem; color: var(--white); text-shadow: 0 0 40px var(--uta-blue-glow); margin-bottom: 30px; }
+        .frame.hovered .photo { filter: grayscale(0%) contrast(1.1); }
 
     </style>
 </head>
 <body>
 
+    <audio id="bgm" loop>
+        <source src="bg-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="cursor"></div>
+    <div id="cursor-trail"></div>
+
+    <div id="preloader">
+        <div id="load-text">IGNITING MEMORIES... <span id="percent">0</span>%</div>
+        <div class="progress-bar"><div id="progress"></div></div>
+        <button id="enter-btn">ENTER THE JOURNEY</button>
+    </div>
+
     <canvas id="webgl-canvas"></canvas>
 
-    <main>
+    <main id="main-content">
         <section class="hero panel">
-            <div class="hero-text">
-                <h1>Sai Srivalli Satya<br><span class="highlight">Yashashwini</span></h1>
+            <div>
+                <h1>Sai Srivalli Satya<br><span style="color: var(--uta-blue);">Yashashwini</span></h1>
                 <h2>(Yashu)</h2>
-                <p>The Maverick Milestone | May 3, 2026</p>
             </div>
+            <div class="scroll-down">SCROLL TO EXPLORE</div>
         </section>
 
         <section class="panel chapter-trigger">
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title">Tiny Paws & Big Dreams</h2>
-                    <p class="poem-text">
-                        A little bundle, full of zest,<br>
-                        Making the nursery the very best.<br>
-                        Surrounded by joy, completeness from the start,<br>
-                        Yashu's energy captured every heart.
-                    </p>
+                    <p class="poem-text split-text">A little bundle, full of zest,<br>Making the nursery the very best.<br>Surrounded by joy, completeness from the start,<br>Yashu's energy captured every heart.</p>
                 </div>
                 <div class="gallery">
-                    <div class="frame" data-speed="1.2"><div class="photo" style="background-image: url('ch1_pic1.jpg');"></div></div>
-                    <div class="frame" data-speed="0.8"><div class="photo" style="background-image: url('ch1_pic2.jpg');"></div></div>
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('ch1_pic3.jpg');"></div></div>
-                    <div class="frame" data-speed="0.9"><div class="photo" style="background-image: url('ch1_pic4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('ch1_pic1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('ch1_pic2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch1_pic3.jpg');"></div></div>
                 </div>
             </div>
         </section>
@@ -171,18 +171,13 @@
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title">Pigtails & Playtime</h2>
-                    <p class="poem-text">
-                        Laughter echoes, world so bright,<br>
-                        Playing and growing in pure delight.<br>
-                        With pigtails bouncing, your presence so sweet,<br>
-                        Every childhood scene you made complete.
-                    </p>
+                    <p class="poem-text split-text">Laughter echoes, world so bright,<br>Playing and growing in pure delight.<br>With pigtails bouncing, your presence so sweet,<br>Every childhood scene you made complete.</p>
                 </div>
                 <div class="gallery">
-                    <div class="frame" data-speed="1.0"><div class="photo" style="background-image: url('ch2_pic1.jpg');"></div></div>
-                    <div class="frame" data-speed="1.3"><div class="photo" style="background-image: url('ch2_pic2.jpg');"></div></div>
-                    <div class="frame" data-speed="0.7"><div class="photo" style="background-image: url('ch2_pic3.jpg');"></div></div>
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('ch2_pic4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.0"><div class="photo" style="background-image: url('ch2_pic1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('ch2_pic2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('ch2_pic3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch2_pic4.jpg');"></div></div>
                 </div>
             </div>
         </section>
@@ -191,19 +186,12 @@
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title">Rebellious & Radiant</h2>
-                    <p class="poem-text">
-                        Teenage spark, vibrant and wild,<br>
-                        Your inner bloom, never mild.<br>
-                        Rebellious spirit, heart ablaze,<br>
-                        Making surroundings shine in distinct ways.
-                    </p>
+                    <p class="poem-text split-text">Teenage spark, vibrant and wild,<br>Your inner bloom, never mild.<br>Rebellious spirit, heart ablaze,<br>Making surroundings shine in distinct ways.</p>
                 </div>
                 <div class="gallery">
-                    <div class="frame" data-speed="1.4"><div class="photo" style="background-image: url('ch3_pic1.jpg');"></div></div>
-                    <div class="frame" data-speed="0.8"><div class="photo" style="background-image: url('ch3_pic2.jpg');"></div></div>
-                    <div class="frame" data-speed="1.2"><div class="photo" style="background-image: url('ch3_pic3.jpg');"></div></div>
-                    <div class="frame" data-speed="0.9"><div class="photo" style="background-image: url('ch3_pic4.jpg');"></div></div>
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('ch3_pic5.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.4"><div class="photo" style="background-image: url('ch3_pic1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('ch3_pic2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('ch3_pic3.jpg');"></div></div>
                 </div>
             </div>
         </section>
@@ -212,64 +200,49 @@
             <div class="chapter-container">
                 <div class="poem-block">
                     <h2 class="chapter-title">Finding Her Wings</h2>
-                    <p class="poem-text">
-                        Soaring high, chasing each dream,<br>
-                        A radiant presence, a perfect team.<br>
-                        You make the world seem complete and whole,<br>
-                        With energy filling every role.
-                    </p>
+                    <p class="poem-text split-text">Soaring high, chasing each dream,<br>A radiant presence, a perfect team.<br>You make the world seem complete and whole,<br>With energy filling every role.</p>
                 </div>
                 <div class="gallery">
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('ch4_pic1.jpg');"></div></div>
-                    <div class="frame" data-speed="0.9"><div class="photo" style="background-image: url('ch4_pic2.jpg');"></div></div>
-                    <div class="frame" data-speed="1.3"><div class="photo" style="background-image: url('ch4_pic3.jpg');"></div></div>
-                    <div class="frame" data-speed="1.0"><div class="photo" style="background-image: url('ch4_pic4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch4_pic1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('ch4_pic2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('ch4_pic3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.0"><div class="photo" style="background-image: url('ch4_pic4.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" style="min-height: 150vh;">
+        <section class="panel chapter-trigger" style="min-height: 180vh;">
             <div class="chapter-container">
                 <div class="poem-block" style="margin: 0 auto; text-align: center;">
                     <h2 class="chapter-title">A Circle of Light</h2>
-                    <p class="poem-text">
-                        A chosen family, a circle so bright,<br>
-                        Filling the days and the longest of nights.<br>
-                        With every shared secret and memories made,<br>
-                        A beautiful bond that will never fade.
-                    </p>
+                    <p class="poem-text split-text">A chosen family, a circle so bright,<br>Filling the days and the longest of nights.<br>With every shared secret and memories made,<br>A beautiful bond that will never fade.</p>
                 </div>
-                <div class="gallery friends-gallery">
-                    <div class="frame" data-speed="1.5"><div class="photo" style="background-image: url('friends_1.jpg');"></div></div>
-                    <div class="frame" data-speed="0.6"><div class="photo" style="background-image: url('friends_2.jpg');"></div></div>
-                    <div class="frame" data-speed="1.2"><div class="photo" style="background-image: url('friends_3.jpg');"></div></div>
-                    <div class="frame" data-speed="0.8"><div class="photo" style="background-image: url('friends_4.jpg');"></div></div>
-                    <div class="frame" data-speed="1.4"><div class="photo" style="background-image: url('friends_5.jpg');"></div></div>
-                    <div class="frame" data-speed="0.9"><div class="photo" style="background-image: url('friends_6.jpg');"></div></div>
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('friends_7.jpg');"></div></div>
-                    <div class="frame" data-speed="1.3"><div class="photo" style="background-image: url('friends_8.jpg');"></div></div>
-                    <div class="frame" data-speed="0.7"><div class="photo" style="background-image: url('friends_9.jpg');"></div></div>
-                    <div class="frame" data-speed="1.6"><div class="photo" style="background-image: url('friends_10.jpg');"></div></div>
+                <div class="gallery">
+                    <div class="frame interactable" data-speed="1.5"><div class="photo" style="background-image: url('friends_1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.6"><div class="photo" style="background-image: url('friends_2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('friends_3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('friends_4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.4"><div class="photo" style="background-image: url('friends_5.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('friends_6.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('friends_7.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('friends_8.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.7"><div class="photo" style="background-image: url('friends_9.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.6"><div class="photo" style="background-image: url('friends_10.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
         <section class="panel chapter-trigger" style="padding-bottom: 20vh;">
             <div class="chapter-container">
-                <h2 class="congrats">Happy Graduation, Yashu!</h2>
-                <div class="poem-block" style="border-color: var(--uta-blue); box-shadow: 0 0 50px rgba(0, 100, 177, 0.4);">
+                <h1 style="font-family: 'Cinzel'; font-size: 5rem; text-shadow: 0 0 40px var(--uta-glow);">Happy Graduation, Yashu!</h1>
+                <div class="poem-block" style="border-color: var(--uta-blue);">
                     <h2 class="chapter-title">The Maverick: UTA '26</h2>
-                    <p class="poem-text" style="text-align: center;">
-                        UTA's proud maverick, shining on,<br>
-                        Making this place complete till you're gone.<br>
-                        Congratulations, Yashu, with energy so grand,<br>
-                        Emptiness gone where you now stand.
-                    </p>
+                    <p class="poem-text split-text" style="text-align: center;">UTA's proud maverick, shining on,<br>Making this place complete till you're gone.<br>Congratulations, Yashu, with energy so grand,<br>Emptiness gone where you now stand.</p>
                 </div>
                 <div class="gallery">
-                    <div class="frame" data-speed="1.2"><div class="photo" style="background-image: url('grad_1.jpg');"></div></div>
-                    <div class="frame" data-speed="0.8"><div class="photo" style="background-image: url('grad_2.jpg');"></div></div>
-                    <div class="frame" data-speed="1.1"><div class="photo" style="background-image: url('grad_3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('grad_1.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('grad_2.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('grad_3.jpg');"></div></div>
                 </div>
             </div>
         </section>
@@ -279,167 +252,181 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ==========================================
-        // 1. THREE.JS: THE LIVING COSMOS BACKGROUND
+        // MAGNETIC CURSOR LOGIC
+        // ==========================================
+        const cursor = document.getElementById('cursor');
+        const trail = document.getElementById('cursor-trail');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let trailX = mouseX, trailY = mouseY;
+
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+        function animateCursor() {
+            cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
+            trailX += (mouseX - trailX) * 0.15; trailY += (mouseY - trailY) * 0.15; // Smooth trailing
+            trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor interacts with frames
+        document.querySelectorAll('.interactable').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(0)'; // Hide dot
+                trail.style.transform = 'translate(-50%, -50%) scale(2)'; // Expand circle
+                trail.style.borderColor = '#fff';
+                el.classList.add('hovered');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                trail.style.transform = 'translate(-50%, -50%) scale(1)';
+                trail.style.borderColor = 'rgba(0, 100, 177, 0.8)';
+                el.classList.remove('hovered');
+            });
+        });
+
+        // ==========================================
+        // THREE.JS: GLOWING GALAXY & BLOOM ENGINE
         // ==========================================
         const canvas = document.querySelector('#webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050508, 0.04);
+        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020202, 0.03);
 
-        // Epic Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const spotLight = new THREE.SpotLight(0x0064B1, 5);
-        spotLight.position.set(0, 20, 10);
-        spotLight.angle = Math.PI / 4;
-        scene.add(spotLight);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.z = 20;
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 150);
-        camera.position.z = 15;
-
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Create a massive, swirling galaxy of particles
-        const particleCount = 4000;
-        const posArray = new Float32Array(particleCount * 3);
-        const colorArray = new Float32Array(particleCount * 3);
-        const colorBlue = new THREE.Color('#0064B1');
-        const colorWhite = new THREE.Color('#FFFFFF');
-        const colorOrange = new THREE.Color('#F58025'); // Subtle UTA accent
+        // Lights
+        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+        const blueLight = new THREE.PointLight(0x0064B1, 5, 100);
+        blueLight.position.set(-10, 10, 10); scene.add(blueLight);
 
-        for(let i = 0; i < particleCount * 3; i+=3) {
-            // Spherical distribution for a galaxy feel
-            let radius = 10 + Math.random() * 40;
-            let theta = Math.random() * Math.PI * 2;
-            let phi = Math.acos((Math.random() * 2) - 1);
-            
-            posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
-            posArray[i+1] = radius * Math.sin(phi) * Math.sin(theta);
-            posArray[i+2] = radius * Math.cos(phi) - 15; // Push back into the scene
-
-            let rand = Math.random();
-            let c = rand > 0.8 ? colorWhite : (rand > 0.75 ? colorOrange : colorBlue);
-            colorArray[i] = c.r; colorArray[i+1] = c.g; colorArray[i+2] = c.b;
-        }
-
+        // Particle Galaxy
+        const pCount = 5000;
         const pGeo = new THREE.BufferGeometry();
-        pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        pGeo.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        const pPos = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i+=3){
+            let r = 15 + Math.random() * 50, theta = Math.random() * Math.PI * 2, phi = Math.acos((Math.random() * 2) - 1);
+            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 20;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({ size: 0.2, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+        const galaxy = new THREE.Points(pGeo, pMat); scene.add(galaxy);
+
+        // Post-Processing Bloom Pass
+        const renderScene = new THREE.RenderPass(scene, camera);
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0; bloomPass.strength = 1.2; bloomPass.radius = 0.5; // Epic Glow
         
-        const pMat = new THREE.PointsMaterial({
-            size: 0.15, vertexColors: true, transparent: true, opacity: 0.8,
-            blending: THREE.AdditiveBlending // Makes particles glow
-        });
+        const composer = new THREE.EffectComposer(renderer);
+        composer.addPass(renderScene); composer.addPass(bloomPass);
 
-        const particleSystem = new THREE.Points(pGeo, pMat);
-        scene.add(particleSystem);
-
-        // --- LOAD THE 3D CAP/GOWN MODEL ---
+        // Load 3D Model with Preloader integration
         let regaliaModel;
         const loader = new THREE.GLTFLoader();
-        loader.load(
-            'uta_regalia.glb', 
-            function (gltf) {
-                regaliaModel = gltf.scene;
-                regaliaModel.position.set(4, -3, -5); 
-                regaliaModel.scale.set(1.5, 1.5, 1.5); 
-                scene.add(regaliaModel);
+        
+        // Simulating load for the cinematic preloader
+        let loadProgress = 0;
+        const percentTxt = document.getElementById('percent');
+        const progBar = document.getElementById('progress');
+        const enterBtn = document.getElementById('enter-btn');
 
-                // Cinematic flythrough timeline
-                const tl = gsap.timeline({
-                    scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1 }
-                });
-                tl.to(regaliaModel.position, { x: -4, y: 0, z: 2 }, 0)
-                  .to(regaliaModel.rotation, { y: Math.PI * 1.5, x: 0.2 }, 0)
-                  .to(regaliaModel.position, { x: 4, y: -2, z: 5 }, 0.4)
-                  .to(regaliaModel.rotation, { y: Math.PI * 3, x: -0.2 }, 0.4)
-                  .to(regaliaModel.position, { x: 0, y: -1, z: 0 }, 0.8)
-                  .to(regaliaModel.rotation, { y: Math.PI * 4.5, x: 0 }, 0.8);
+        const fakeLoad = setInterval(() => {
+            loadProgress += Math.random() * 5;
+            if(loadProgress >= 100) {
+                clearInterval(fakeLoad); loadProgress = 100;
+                enterBtn.classList.add('ready');
+                document.getElementById('load-text').innerHTML = "JOURNEY READY";
             }
-        );
+            percentTxt.innerText = Math.floor(loadProgress);
+            progBar.style.width = loadProgress + '%';
+        }, 100);
+
+        loader.load('uta_regalia.glb', (gltf) => {
+            regaliaModel = gltf.scene;
+            regaliaModel.position.set(6, -3, -5); regaliaModel.scale.set(1.8, 1.8, 1.8);
+            scene.add(regaliaModel);
+
+            // Cinematic 3D Path
+            const tl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1 } });
+            tl.to(regaliaModel.position, { x: -5, y: 1, z: 2 }, 0).to(regaliaModel.rotation, { y: Math.PI * 2, x: 0.3 }, 0)
+              .to(regaliaModel.position, { x: 5, y: -2, z: 8 }, 0.3).to(regaliaModel.rotation, { y: Math.PI * 4, x: -0.1 }, 0.3)
+              .to(regaliaModel.position, { x: 0, y: -1, z: -2 }, 0.7).to(regaliaModel.rotation, { y: Math.PI * 6, x: 0 }, 0.7);
+        });
 
         // ==========================================
-        // 2. GSAP: EPIC SCROLL & PARALLAX PHYSICS
+        // BOOT SEQUENCE & GSAP ANIMATIONS
         // ==========================================
+        enterBtn.addEventListener('click', () => {
+            document.getElementById('preloader').style.transform = 'translateY(-100%)';
+            document.getElementById('preloader').style.transition = 'transform 1s cubic-bezier(0.77, 0, 0.175, 1)';
+            document.body.style.overflowY = 'auto'; // Unlock scroll
+            document.querySelector('main').style.opacity = '1';
+            
+            // Play Audio
+            const audio = document.getElementById('bgm');
+            audio.volume = 0.5; audio.play().catch(e => console.log("Audio play prevented until interaction."));
+        });
+
+        // Split-text hack for poems
+        document.querySelectorAll('.split-text').forEach(p => {
+            const words = p.innerHTML.split('<br>').map(line => 
+                line.split(' ').map(word => `<span style="opacity:0; display:inline-block; transform:translateY(10px);">${word}&nbsp;</span>`).join('')
+            ).join('<br>');
+            p.innerHTML = words;
+        });
+
         const chapters = gsap.utils.toArray('.chapter-trigger');
-
         chapters.forEach((chapter) => {
-            const poem = chapter.querySelector('.poem-block');
+            const block = chapter.querySelector('.poem-block');
+            const words = chapter.querySelectorAll('.split-text span');
             const frames = chapter.querySelectorAll('.frame');
 
-            const tl = gsap.timeline({
-                scrollTrigger: { trigger: chapter, start: "top 80%", toggleActions: "play none none reverse" }
-            });
+            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 75%" } });
 
-            // 1. Glass panel slides in with a blur effect
-            if(poem) {
-                tl.fromTo(poem, 
-                    { x: chapter.classList.contains('even') ? 150 : -150, opacity: 0, filter: "blur(10px)" },
-                    { x: 0, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power4.out" }
-                );
-            }
-
-            // 2. Photos burst onto the screen
-            if(frames.length > 0) {
+            if(block) tl.fromTo(block, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.5, ease: "power3.out" });
+            if(words.length) tl.to(words, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" }, "-=1");
+            
+            if(frames.length) {
                 tl.fromTo(frames, 
-                    { y: 200, z: -500, rotationX: 60, rotationY: () => Math.random() * 60 - 30, opacity: 0 },
-                    { y: 0, z: 0, rotationX: 0, rotationY: () => Math.random() * 10 - 5, opacity: 1, 
-                      duration: 1.5, stagger: 0.1, ease: "back.out(1.2)" },
-                    "-=1"
+                    { y: 300, z: -800, rotationX: 45, rotationY: () => Math.random() * 90 - 45, opacity: 0 },
+                    { y: 0, z: 0, rotationX: 0, rotationY: () => Math.random() * 10 - 5, opacity: 1, duration: 1.8, stagger: 0.1, ease: "power4.out" },
+                    "-=1.5"
                 );
 
-                // 3. Apply Parallax Scroll Effect to each photo frame based on its data-speed attribute
                 frames.forEach(frame => {
                     const speed = parseFloat(frame.getAttribute('data-speed')) || 1;
                     gsap.to(frame, {
-                        y: () => -100 * speed, // Moves up at different speeds
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: chapter,
-                            start: "top bottom",
-                            end: "bottom top",
-                            scrub: true // Ties movement directly to scrollbar
-                        }
+                        y: () => -150 * speed, ease: "none",
+                        scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }
                     });
                 });
             }
         });
 
-        // Mouse Interactivity for Particles
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-        });
-
-        // ==========================================
-        // 3. RENDER LOOP
-        // ==========================================
+        // Render Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
-
-            // Swirl the galaxy
-            particleSystem.rotation.y = time * 0.03;
-            particleSystem.rotation.x = time * 0.01;
-
-            // Camera smoothly follows mouse
-            camera.position.x += (mouseX * 2 - camera.position.x) * 0.02;
-            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.02;
+            galaxy.rotation.y = time * 0.02; galaxy.rotation.x = time * 0.01;
+            
+            // Camera subtle mouse follow
+            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 5 - camera.position.x) * 0.05;
+            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 5 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
 
-            if (regaliaModel) regaliaModel.position.y += Math.sin(time * 1.5) * 0.003;
+            if(regaliaModel) regaliaModel.position.y += Math.sin(time * 2) * 0.005;
 
-            renderer.render(scene, camera);
+            composer.render(); // Use composer for Bloom effect instead of normal renderer
         }
         animate();
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>

@@ -78,7 +78,7 @@
         @keyframes pulse-text { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; text-shadow: 0 0 10px var(--white); } }
 
         /* --- CHAPTER ARCHITECTURE --- */
-        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 6vh; z-index: 2; align-items: center; }
+        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 8vh; z-index: 2; align-items: center; }
         
         .poem-block {
             max-width: 850px; width: 100%; background: rgba(8, 8, 12, 0.4);
@@ -93,12 +93,20 @@
         .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); margin-bottom: 25px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); line-height: 1.1; }
         .poem-text { font-size: clamp(1.1rem, 2vw, 1.4rem); line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
 
-        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; }
-        .parallax-wrap { will-change: transform; }
+        /* ANTI-OVERLAP GRID SYSTEM */
+        .gallery { 
+            display: grid; 
+            /* This guarantees perfect mathematical spacing. No overlapping ever. */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 60px; /* Massive gap to ensure frames have breathing room */
+            width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; 
+            place-items: center; /* Locks frames exactly in the center of their grid cell */
+        }
+        
+        .parallax-wrap { will-change: transform; width: 100%; display: flex; justify-content: center; }
 
-        /* BUG FIX: Removed preserve-3d to stop browser rendering engine from hiding the photos */
         .frame {
-            width: clamp(260px, 25vw, 320px); height: clamp(340px, 33vw, 420px); 
+            width: 100%; max-width: 320px; aspect-ratio: 3/4; /* Keeps perfect polaroid proportions */
             border-radius: 8px; padding: 12px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px rgba(0,0,0,0.7);
@@ -106,18 +114,14 @@
         }
         .frame:hover { border-color: rgba(0, 100, 177, 0.8); z-index: 50; }
         
-        /* BUG FIX: Added background-color #111 fallback, background-repeat, and removed translateZ to guarantee rendering */
         .photo-inner { 
             width: 100%; height: 100%; border-radius: 4px; 
-            background-color: #111; 
-            background-size: cover; background-position: center; background-repeat: no-repeat; 
+            background-color: #111; /* Fallback color before load */
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             filter: grayscale(60%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
             position: relative; overflow: hidden; 
         }
-        .frame:hover .photo-inner { 
-            filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); 
-            transform: scale(1.03); /* Beautiful subtle pop instead of Z-axis push */
-        }
+        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(0, 100, 177, 0.4); transform: scale(1.03); }
 
         .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
@@ -298,7 +302,7 @@
             });
         });
 
-        // 3D Tilt BUG FIX: Tilt applied to entire flat frame securely, no preserve-3d clipping
+        // Safe 3D Tilt - Prevents Rendering Glitches
         document.querySelectorAll('.frame').forEach(frame => {
             frame.addEventListener('mousemove', (e) => {
                 if (isTouch) return;
@@ -431,12 +435,13 @@
             initAmbientFloat();
         });
 
-        // Ambient breathing float for frames safely applied to parallax wrapper
+        // Anti-Overlap Micro Drift
         function initAmbientFloat() {
             gsap.utils.toArray('.parallax-wrap').forEach(wrap => {
                 gsap.to(wrap, {
-                    x: `+=${Math.random() * 8 - 4}`,
-                    rotationZ: Math.random() * 2 - 1,
+                    y: `+=${Math.random() * 4 - 2}`, // Micro drift only
+                    x: `+=${Math.random() * 4 - 2}`,
+                    rotationZ: Math.random() * 1 - 0.5,
                     duration: Math.random() * 2 + 3,
                     yoyo: true, repeat: -1, ease: "sine.inOut", delay: Math.random() * 2
                 });

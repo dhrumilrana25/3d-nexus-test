@@ -3,32 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yashu's Graduation Journey | UTA '26</title>
-    
+    <title>Yashu's UTA Graduation | May 3, 2026</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <style>
-        /* --- CORE STYLES & THEME --- */
+        /* --- EPIC THEME & LAYOUT --- */
         :root {
             --uta-blue: #0064B1;
-            --uta-orange: #F58025; /* Subtle accent */
-            --bg-dark: #050505;
-            --text-light: #F8F9FA;
+            --uta-orange: #F58025;
+            --black: #030303;
+            --white: #F8F9FA;
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
+            --font-poem: 'Georgia', serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            font-family: var(--font-main);
             overflow-x: hidden;
         }
 
-        /* 3D Canvas fixed in background */
+        /* The 3D Canvas sits fixed behind everything */
         #webgl-canvas {
             position: fixed;
             top: 0;
@@ -39,169 +42,93 @@
             pointer-events: none;
         }
 
-        main {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* --- CONTENT SECTIONS --- */
+        main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
 
         .panel {
             min-height: 100vh;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
             display: flex;
             align-items: center;
-            padding: 5% 10%;
+            padding: 10vh 5%;
         }
 
-        /* --- TYPOGRAPHY --- */
-        .hero {
-            justify-content: flex-end; /* Push text to right, 3D hologram on left */
-            text-align: right;
-            padding-top: 15vh;
+        /* --- HERO SECTION --- */
+        .hero { justify-content: flex-start; padding-left: 10%; }
+        .hero-text h1 { font-size: 5rem; letter-spacing: 2px; line-height: 1.1; text-shadow: 0 5px 25px rgba(0, 100, 177, 0.8); }
+        .hero-text .highlight { color: var(--uta-blue); font-weight: bold; }
+        .hero-text h2 { font-size: 2.5rem; font-style: italic; color: #ddd; margin: 15px 0; }
+        .hero-text p { font-size: 1.2rem; color: var(--uta-orange); text-transform: uppercase; letter-spacing: 5px; }
+
+        .scroll-hint {
+            position: absolute; bottom: 5vh; left: 10%;
+            font-size: 1rem; letter-spacing: 3px; color: var(--white);
+            animation: bounce 2s infinite; opacity: 0.7;
         }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-15px); } 60% { transform: translateY(-7px); } }
 
-        .hero-text h1 {
-            font-size: 4rem;
-            color: var(--text-light);
-            letter-spacing: 2px;
-            line-height: 1.1;
-            text-shadow: 0 0 20px rgba(0, 100, 177, 0.6);
-        }
-
-        .hero-text .highlight { color: var(--uta-blue); }
-
-        .hero-text h2 {
-            font-size: 2.5rem;
-            font-style: italic;
-            font-weight: 300;
-            margin: 10px 0 20px 0;
-            color: #ccc;
-        }
-
-        .hero-text p {
-            font-size: 1.2rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--uta-orange);
-        }
-
-        /* --- INSTAX PHOTO CARDS (With 3D Flip) --- */
-        .chapter { justify-content: flex-end; }
-        .chapter:nth-child(even) { justify-content: flex-start; }
-
-        .instax-container {
-            width: 320px;
-            height: 380px;
-            perspective: 1000px; /* Required for 3D flip */
-            cursor: pointer;
-            margin: 50px 0;
-        }
-
-        .instax-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-        }
-
-        .instax-container.flipped .instax-inner {
-            transform: rotateY(180deg);
-        }
-
-        .instax-front, .instax-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            background-color: #fff;
-            padding: 15px 15px 50px 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            border-radius: 4px;
+        /* --- CHAPTER LAYOUTS --- */
+        .chapter-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-
-        .instax-back {
-            transform: rotateY(180deg);
-            background-color: #fdfdfd;
-            justify-content: center;
-            padding: 30px;
-            color: #222;
-        }
-
-        .photo-placeholder {
             width: 100%;
-            height: 280px;
-            background-color: #2a2a2a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            margin-bottom: 15px;
-            overflow: hidden;
-            /* Replace with: background-image: url('your-image.jpg'); background-size: cover; background-position: center; */
-        }
-
-        .caption {
-            color: var(--bg-dark);
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .note-text {
-            font-family: 'Georgia', serif;
-            font-style: italic;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            color: #333;
-        }
-
-        .rotate-left { transform: rotate(-4deg); }
-        .rotate-right { transform: rotate(4deg); }
-
-        .final-chapter {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
             gap: 40px;
-            padding-bottom: 10vh;
+        }
+        
+        /* Alternate text alignment for rhythm */
+        .panel:nth-child(even) .chapter-container { align-items: flex-end; text-align: right; }
+        .panel:nth-child(odd) .chapter-container { align-items: flex-start; text-align: left; }
+        
+        .panel:last-child .chapter-container { align-items: center; text-align: center; }
+
+        /* Poem Styling */
+        .poem-block {
+            max-width: 600px;
+            background: rgba(10, 10, 10, 0.6);
+            padding: 30px;
+            border-left: 4px solid var(--uta-blue);
+            backdrop-filter: blur(10px);
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .panel:nth-child(even) .poem-block { border-left: none; border-right: 4px solid var(--uta-blue); }
+
+        .chapter-title { color: var(--uta-blue); font-size: 2.5rem; margin-bottom: 15px; font-weight: 300; }
+        .poem-text { font-family: var(--font-poem); font-size: 1.3rem; line-height: 1.8; color: #e0e0e0; font-style: italic; }
+
+        /* --- MULTI-PHOTO GALLERY --- */
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+            max-width: 800px;
+        }
+        .panel:nth-child(even) .gallery { justify-content: flex-end; }
+        .panel:last-child .gallery { justify-content: center; max-width: 1200px; }
+
+        .instax {
+            background-color: var(--white);
+            padding: 10px 10px 40px 10px;
+            border-radius: 3px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            width: 220px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .instax:hover { transform: scale(1.08) translateY(-10px) !important; box-shadow: 0 25px 45px rgba(0, 100, 177, 0.4); z-index: 10; }
+
+        .photo {
+            width: 100%;
+            height: 250px;
+            background-color: #222;
+            background-size: cover;
+            background-position: center;
         }
 
-        .congrats-text {
-            color: var(--text-light);
-            font-size: 3rem;
-            text-shadow: 0 0 30px rgba(0, 100, 177, 0.8);
-        }
+        .congrats { font-size: 5rem; color: var(--uta-blue); text-shadow: 0 0 30px rgba(0, 100, 177, 0.8); margin-bottom: 20px; }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 5vh;
-            right: 10vw;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            color: var(--uta-blue);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        @media (max-width: 768px) {
-            .hero, .chapter { justify-content: center; text-align: center; }
-            .hero-text h1 { font-size: 2.5rem; }
-        }
     </style>
 </head>
 <body>
@@ -215,238 +142,305 @@
                 <h2>(Yashu)</h2>
                 <p>The Maverick Milestone | May 3, 2026</p>
             </div>
-            <div class="scroll-indicator">SCROLL DOWN ↓</div>
+            <div class="scroll-hint">BEGIN THE JOURNEY ↓</div>
         </section>
 
-        <section class="chapter panel">
-            <div class="instax-container rotate-left" onclick="this.classList.toggle('flipped')">
-                <div class="instax-inner">
-                    <div class="instax-front">
-                        <div class="photo-placeholder">Photo 1 Placeholder</div>
-                        <p class="caption">Tiny Paws & Big Dreams</p>
-                    </div>
-                    <div class="instax-back">
-                        <p class="note-text">"Before the degrees and the late-night coding sessions, you were just a girl with a big imagination. Look how far you've come."</p>
-                    </div>
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <div class="poem-block">
+                    <h2 class="chapter-title">Tiny Paws & Big Dreams</h2>
+                    <p class="poem-text">
+                        A little bundle, full of zest,<br>
+                        Making the nursery the very best.<br>
+                        Surrounded by joy, completeness from the start,<br>
+                        Yashu's energy captured every heart.
+                    </p>
+                </div>
+                <div class="gallery">
+                    <div class="instax"><div class="photo" style="background-image: url('ch1_pic1.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch1_pic2.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch1_pic3.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch1_pic4.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="chapter panel">
-            <div class="instax-container rotate-right" onclick="this.classList.toggle('flipped')">
-                <div class="instax-inner">
-                    <div class="instax-front">
-                        <div class="photo-placeholder">Photo 2 Placeholder</div>
-                        <p class="caption">Pigtails & Playtime</p>
-                    </div>
-                    <div class="instax-back">
-                        <p class="note-text">"Write your personal memory about her childhood here. Tap any card to flip it back and forth!"</p>
-                    </div>
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <div class="poem-block">
+                    <h2 class="chapter-title">Pigtails & Playtime</h2>
+                    <p class="poem-text">
+                        Laughter echoes, world so bright,<br>
+                        Playing and growing in pure delight.<br>
+                        With pigtails bouncing, your presence so sweet,<br>
+                        Every childhood scene you made complete.
+                    </p>
+                </div>
+                <div class="gallery">
+                    <div class="instax"><div class="photo" style="background-image: url('ch2_pic1.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch2_pic2.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch2_pic3.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="chapter panel">
-            <div class="instax-container rotate-left" onclick="this.classList.toggle('flipped')">
-                <div class="instax-inner">
-                    <div class="instax-front">
-                        <div class="photo-placeholder">Photo 3 Placeholder</div>
-                        <p class="caption">Rebellious & Radiant</p>
-                    </div>
-                    <div class="instax-back">
-                        <p class="note-text">"Write a sweet note about her teenage years here."</p>
-                    </div>
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <div class="poem-block">
+                    <h2 class="chapter-title">Rebellious & Radiant</h2>
+                    <p class="poem-text">
+                        Teenage spark, vibrant and wild,<br>
+                        Your inner bloom, never mild.<br>
+                        Rebellious spirit, heart ablaze,<br>
+                        Making surroundings shine in distinct ways.
+                    </p>
+                </div>
+                <div class="gallery">
+                    <div class="instax"><div class="photo" style="background-image: url('ch3_pic1.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch3_pic2.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch3_pic3.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch3_pic4.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="chapter panel">
-            <div class="instax-container rotate-right" onclick="this.classList.toggle('flipped')">
-                <div class="instax-inner">
-                    <div class="instax-front">
-                        <div class="photo-placeholder">Photo 4 Placeholder</div>
-                        <p class="caption">Finding Her Wings</p>
-                    </div>
-                    <div class="instax-back">
-                        <p class="note-text">"To the late nights, the hard work, and the beautiful young woman you've become."</p>
-                    </div>
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <div class="poem-block">
+                    <h2 class="chapter-title">Finding Her Wings</h2>
+                    <p class="poem-text">
+                        Soaring high, chasing each dream,<br>
+                        A radiant presence, a perfect team.<br>
+                        You make the world seem complete and whole,<br>
+                        With energy filling every role.
+                    </p>
+                </div>
+                <div class="gallery">
+                    <div class="instax"><div class="photo" style="background-image: url('ch4_pic1.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch4_pic2.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('ch4_pic3.jpg');"></div></div>
                 </div>
             </div>
         </section>
 
-        <section class="chapter panel final-chapter">
-            <h2 class="congrats-text">Happy Graduation, Yashu!</h2>
-            <div class="instax-container" onclick="this.classList.toggle('flipped')">
-                <div class="instax-inner">
-                    <div class="instax-front">
-                        <div class="photo-placeholder" style="background-color: #0064B1; color: white;">UTA Grad Photo</div>
-                        <p class="caption">The Maverick: UTA '26</p>
-                    </div>
-                    <div class="instax-back">
-                        <p class="note-text">"I am incredibly proud to be your partner. Here's to your bright future and all the amazing things you will build. I love you."</p>
-                    </div>
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <h2 class="congrats">Happy Graduation, Yashu!</h2>
+                <div class="poem-block" style="border: 2px solid var(--uta-blue);">
+                    <h2 class="chapter-title">The Maverick: UTA '26</h2>
+                    <p class="poem-text" style="text-align: center;">
+                        UTA's proud maverick, shining on,<br>
+                        Making this place complete till you're gone.<br>
+                        Congratulations, Yashu, with energy so grand,<br>
+                        Emptiness gone where you now stand.
+                    </p>
+                </div>
+                <div class="gallery">
+                    <div class="instax"><div class="photo" style="background-image: url('grad_pic1.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('grad_pic2.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('grad_pic3.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('grad_pic4.jpg');"></div></div>
+                    <div class="instax"><div class="photo" style="background-image: url('grad_pic5.jpg');"></div></div>
                 </div>
             </div>
         </section>
     </main>
 
     <script>
+        gsap.registerPlugin(ScrollTrigger);
+
         // ==========================================
-        // 1. THREE.JS PARTICLE HOLOGRAM SETUP
+        // 1. THREE.JS WORLD SETUP (Particles + Model)
         // ==========================================
         const canvas = document.querySelector('#webgl-canvas');
         const scene = new THREE.Scene();
         
-        // Add a subtle fog to make particles fade in the distance
-        scene.fog = new THREE.FogExp2(0x050505, 0.08);
+        // Fog blends the background into the dark abyss
+        scene.fog = new THREE.FogExp2(0x030303, 0.05);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.z = 8;
-        camera.position.x = -2; // Offset camera to put model on the left
+        // Premium Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        directionalLight.position.set(5, 10, 7);
+        scene.add(directionalLight);
+        const utaBlueLight = new THREE.PointLight(0x0064B1, 3, 50);
+        utaBlueLight.position.set(-5, 0, 5);
+        scene.add(utaBlueLight);
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 10);
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // --- Generate Custom Particle Graduation Cap ---
-        const particleCount = 6000;
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-
-        const colorUtaBlue = new THREE.Color('#0064B1');
+        // --- THE PARTICLE FIELD (Moving Background) ---
+        const particleCount = 2000;
+        const posArray = new Float32Array(particleCount * 3);
+        const colorArray = new Float32Array(particleCount * 3);
+        const colorBlue = new THREE.Color('#0064B1');
         const colorWhite = new THREE.Color('#FFFFFF');
 
-        let particleIndex = 0;
+        for(let i = 0; i < particleCount * 3; i+=3) {
+            // Spread particles over a large 3D area
+            posArray[i] = (Math.random() - 0.5) * 40;     // x
+            posArray[i+1] = (Math.random() - 0.5) * 40;   // y
+            posArray[i+2] = (Math.random() - 0.5) * 20 - 10; // z (push back)
 
-        function addParticle(x, y, z, colorObj) {
-            if (particleIndex >= particleCount) return;
-            positions[particleIndex * 3] = x;
-            positions[particleIndex * 3 + 1] = y;
-            positions[particleIndex * 3 + 2] = z;
-            colors[particleIndex * 3] = colorObj.r;
-            colors[particleIndex * 3 + 1] = colorObj.g;
-            colors[particleIndex * 3 + 2] = colorObj.b;
-            particleIndex++;
+            let c = Math.random() > 0.5 ? colorBlue : colorWhite;
+            colorArray[i] = c.r; colorArray[i+1] = c.g; colorArray[i+2] = c.b;
         }
 
-        // 1. Mortarboard (The flat diamond/square on top)
-        for(let i = 0; i < 3500; i++) {
-            let x = (Math.random() - 0.5) * 6;
-            let z = (Math.random() - 0.5) * 6;
-            let y = 1; // Flat height
-            // Add slight random noise to y for a glowing volume effect
-            y += (Math.random() - 0.5) * 0.1;
-            
-            // Mix white and blue for the top
-            let c = Math.random() > 0.8 ? colorWhite : colorUtaBlue;
-            addParticle(x, y, z, c);
-        }
-
-        // 2. The Skullcap (Dome underneath)
-        for(let i = 0; i < 1500; i++) {
-            let theta = Math.random() * Math.PI * 2;
-            let radius = 1.8 + (Math.random() * 0.2); // slight thickness
-            let height = 1 - (Math.random() * 1.5); // Drops down from the board
-            let x = Math.cos(theta) * radius;
-            let z = Math.sin(theta) * radius;
-            addParticle(x, height, z, colorUtaBlue);
-        }
-
-        // 3. The Tassel (Hanging from center)
-        for(let i = 0; i < 1000; i++) {
-            // Tassel originates near center, drops off to one side
-            let drop = Math.random();
-            let x = 0.5 + (drop * 2.5); // curves outwards
-            let z = 0.5 + (drop * 2.5);
-            let y = 1 - (drop * 3); // falls downwards
-            
-            // Add scatter to the bottom to look like frayed thread
-            x += (Math.random() - 0.5) * (drop * 0.5);
-            z += (Math.random() - 0.5) * (drop * 0.5);
-
-            let c = Math.random() > 0.5 ? colorWhite : colorUtaBlue;
-            addParticle(x, y, z, c);
-        }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        // Create glowing particle material
-        const material = new THREE.PointsMaterial({
-            size: 0.05,
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.08,
             vertexColors: true,
             transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending // Creates a light-hologram glowing effect
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
         });
 
-        const hologramCap = new THREE.Points(geometry, material);
-        // Tilt it slightly so it looks like it's resting dynamically
-        hologramCap.rotation.x = 0.2;
-        hologramCap.rotation.z = 0.1;
-        scene.add(hologramCap);
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
 
+        // --- LOAD THE CAP & GOWN MODEL ---
+        let regaliaModel;
+        const loader = new THREE.GLTFLoader();
+
+        // MAKE SURE YOUR FILE IS NAMED 'uta_regalia.glb'
+        loader.load(
+            'uta_regalia.glb', 
+            function (gltf) {
+                regaliaModel = gltf.scene;
+                regaliaModel.position.set(3, -2, 0); // Start on the right side
+                regaliaModel.scale.set(1.2, 1.2, 1.2); 
+                scene.add(regaliaModel);
+
+                setupCinematicScroll();
+            },
+            undefined,
+            function (error) { console.error('Model not found. Please add uta_regalia.glb to your folder.', error); }
+        );
 
         // ==========================================
-        // 2. GSAP SCROLL ANIMATIONS
+        // 2. GSAP SCROLL ANIMATIONS (Epic Transitions)
         // ==========================================
-        gsap.registerPlugin(ScrollTrigger);
+        function setupCinematicScroll() {
+            if (!regaliaModel) return;
 
-        // Animate the Hologram Cap based on scroll
-        gsap.to(hologramCap.rotation, {
-            y: Math.PI * 2, // Full 360 degree spin
-            x: 0.5,         // Tilt down to see the top
-            scrollTrigger: {
-                trigger: "main",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1.5 // Smooth interpolation
-            }
-        });
-
-        // Float in the Instax cards as you scroll
-        gsap.utils.toArray('.instax-container').forEach(card => {
-            gsap.from(card, {
-                y: 100,
-                opacity: 0,
-                rotation: Math.random() * 20 - 10, // Random wild rotation before snapping into place
-                duration: 1,
+            // Camera/Model Flythrough Timeline
+            const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%", // Triggers when the top of the card hits 85% down the screen
-                    end: "bottom 20%",
+                    trigger: "main",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1.5
+                }
+            });
+
+            // Model weaves through the page as you scroll
+            tl.to(regaliaModel.position, { x: -3, y: -1, z: 2 }, 0)
+              .to(regaliaModel.rotation, { y: Math.PI }, 0)
+              
+              .to(regaliaModel.position, { x: 3, y: -2, z: 3 }, 0.3)
+              .to(regaliaModel.rotation, { y: Math.PI * 2, x: 0.2 }, 0.3)
+              
+              .to(regaliaModel.position, { x: -2, y: 0, z: 1 }, 0.6)
+              .to(regaliaModel.rotation, { y: Math.PI * 3, x: -0.1 }, 0.6)
+              
+              .to(regaliaModel.position, { x: 0, y: -1, z: -3 }, 0.9)
+              .to(regaliaModel.rotation, { y: Math.PI * 4, x: 0 }, 0.9);
+        }
+
+        // --- Animate the HTML Elements (Poems and Photos) ---
+        const chapters = gsap.utils.toArray('.chapter-trigger');
+
+        chapters.forEach((chapter) => {
+            const poem = chapter.querySelector('.poem-block');
+            const photos = chapter.querySelectorAll('.instax');
+
+            const chapterTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: chapter,
+                    start: "top 75%", // Triggers when chapter hits 75% of viewport
                     toggleActions: "play none none reverse"
                 }
             });
+
+            // 1. Poem fades and slides in
+            if(poem) {
+                chapterTl.from(poem, { 
+                    x: chapter.classList.contains('even') ? 100 : -100, 
+                    opacity: 0, 
+                    duration: 1, 
+                    ease: "power3.out" 
+                });
+            }
+
+            // 2. Photos fly in staggeringly with 3D rotations
+            if(photos.length > 0) {
+                chapterTl.from(photos, {
+                    y: 150,
+                    z: -200,
+                    rotationX: 45,
+                    rotationY: () => Math.random() * 40 - 20, // Random tilt
+                    opacity: 0,
+                    duration: 1.2,
+                    stagger: 0.2, // Time between each photo appearing
+                    ease: "back.out(1.5)" // Bouncy settling effect
+                }, "-=0.5"); // Start slightly before poem finishes
+            }
+
+            // Scatter the photos slightly for a natural look once they land
+            gsap.set(photos, {
+                rotation: () => Math.random() * 12 - 6, // Random 2D rotation
+                y: () => Math.random() * 20 - 10
+            });
         });
 
+        // Interactive Mouse Movement for Particles
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX / window.innerWidth - 0.5;
+            mouseY = event.clientY / window.innerHeight - 0.5;
+        });
 
         // ==========================================
-        // 3. ANIMATION LOOP
+        // 3. RENDER LOOP
         // ==========================================
         const clock = new THREE.Clock();
-
-        function tick() {
+        
+        function animate() {
+            requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
 
-            // Give the cap a gentle, continuous floating hover effect
-            hologramCap.position.y = Math.sin(elapsedTime * 0.5) * 0.3;
-            
-            // Very slow ambient rotation independent of scroll
-            hologramCap.rotation.y += 0.001;
+            // Rotate particle field slowly
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+            particlesMesh.rotation.x = elapsedTime * 0.02;
+
+            // Parallax effect on particles based on mouse
+            particlesMesh.position.x += (mouseX * 2 - particlesMesh.position.x) * 0.05;
+            particlesMesh.position.y += (-mouseY * 2 - particlesMesh.position.y) * 0.05;
+
+            // Gentle breathing effect for the regalia model
+            if (regaliaModel) {
+                regaliaModel.position.y += Math.sin(elapsedTime * 2) * 0.002;
+            }
 
             renderer.render(scene, camera);
-            window.requestAnimationFrame(tick);
         }
-        tick();
+        animate();
 
-        // Resize handler
+        // Handle Window Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
     </script>
 </body>

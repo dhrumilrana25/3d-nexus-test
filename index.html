@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yashu's Epic Journey | UTA '26</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
@@ -21,109 +19,95 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
-        /* --- GLOBAL & LIQUID UI --- */
+        /* --- GOD TIER STYLING --- */
         :root {
             --uta-blue: #0064B1;
-            --uta-glow: rgba(0, 100, 177, 0.8);
-            --black: #020202;
+            --uta-glow: rgba(0, 100, 177, 0.9);
+            --black: #010103;
             --white: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hides default cursor */ }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
+        body { background-color: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow-x: hidden; overflow-y: hidden; }
 
-        body {
-            background-color: var(--black); color: var(--white);
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden; overflow-y: hidden; /* Locked until loaded */
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--black); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); box-shadow: 0 0 10px var(--uta-glow); }
 
-        /* --- MAGNETIC CURSOR --- */
-        #cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border-radius: 50%; background: var(--white);
-            mix-blend-mode: difference; pointer-events: none; z-index: 10000;
-            transition: width 0.3s, height 0.3s, background 0.3s;
-            transform: translate(-50%, -50%);
-        }
-        #cursor-trail {
-            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
-            border-radius: 50%; border: 1px solid var(--uta-glow);
-            pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); transition: 0.1s ease-out;
-        }
+        /* --- LIQUID CURSOR --- */
+        #cursor { position: fixed; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.1s; }
+        #cursor-trail { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--uta-blue); box-shadow: 0 0 15px var(--uta-glow); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.15s ease-out; }
 
-        /* --- PRELOADER --- */
-        #preloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--black); z-index: 9000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        #load-text { font-family: 'Cinzel', serif; font-size: 2rem; letter-spacing: 5px; color: var(--white); margin-bottom: 20px; }
-        .progress-bar { width: 300px; height: 2px; background: #222; position: relative; overflow: hidden; }
-        #progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--uta-blue); box-shadow: 0 0 20px var(--uta-glow); }
-        #enter-btn {
-            margin-top: 40px; padding: 15px 40px; border: 1px solid var(--uta-blue);
-            background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif;
-            letter-spacing: 3px; border-radius: 30px; opacity: 0; transform: translateY(20px);
-            transition: all 0.4s; pointer-events: none; cursor: none;
-        }
+        /* --- PRELOADER SEQUENCE --- */
+        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #load-text { font-family: 'Cinzel', serif; font-size: 1.5rem; letter-spacing: 10px; color: #555; margin-bottom: 30px; }
+        .progress-bar { width: 400px; height: 1px; background: #111; position: relative; overflow: hidden; }
+        #progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--uta-blue); box-shadow: 0 0 20px var(--uta-blue); }
+        #enter-btn { margin-top: 40px; padding: 15px 50px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 4px; border-radius: 5px; opacity: 0; transform: translateY(20px); transition: all 0.4s; pointer-events: none; }
         #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; }
-        #enter-btn.ready:hover { background: var(--uta-blue); box-shadow: 0 0 30px var(--uta-glow); }
+        #enter-btn.ready:hover { border-color: var(--uta-blue); box-shadow: 0 0 40px var(--uta-glow) inset, 0 0 20px var(--uta-glow); text-shadow: 0 0 10px var(--white); }
 
         /* --- 3D CANVAS --- */
         #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
 
-        /* --- LAYOUT --- */
+        /* --- CONTENT LAYOUT --- */
         main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
-        .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
+        .panel { min-height: 100vh; width: 100%; max-width: 1800px; display: flex; align-items: center; padding: 15vh 5%; }
 
         .hero { justify-content: center; text-align: center; height: 100vh; }
-        .hero h1 { font-family: 'Cinzel', serif; font-size: 7rem; letter-spacing: 2px; line-height: 1; text-shadow: 0 0 50px var(--uta-glow); }
-        .hero h2 { font-size: 2.5rem; font-weight: 300; font-style: italic; opacity: 0.8; margin-top: 20px; }
-        .scroll-down { position: absolute; bottom: 50px; font-size: 0.9rem; letter-spacing: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; text-shadow: 0 0 10px var(--white); } }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: 8rem; letter-spacing: 5px; line-height: 1; text-shadow: 0 0 60px var(--uta-glow); margin-bottom: 20px; }
+        .hero h2 { font-size: 2rem; font-weight: 200; font-style: italic; letter-spacing: 2px; }
+        .scroll-down { position: absolute; bottom: 40px; font-size: 0.8rem; letter-spacing: 6px; animation: pulse 2s infinite; opacity: 0.5; }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; text-shadow: 0 0 15px var(--white); } }
 
-        /* --- ULTIMATE GLASSMORPHISM --- */
-        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 60px; z-index: 2; }
+        /* --- GLASSMORPHISM POEMS --- */
+        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 80px; z-index: 2; perspective: 1000px; }
         .panel:nth-child(even) .chapter-container { align-items: flex-end; text-align: right; }
         .panel:nth-child(odd) .chapter-container { align-items: flex-start; text-align: left; }
         .panel:last-child .chapter-container { align-items: center; text-align: center; }
 
         .poem-block {
-            max-width: 700px; background: rgba(10, 10, 15, 0.4);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 50px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 40px rgba(0, 100, 177, 0.15);
+            max-width: 750px; background: rgba(5, 5, 8, 0.3);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px; padding: 60px; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+            position: relative; overflow: hidden;
         }
-        .chapter-title { font-family: 'Cinzel', serif; font-size: 3.5rem; margin-bottom: 20px; color: var(--white); }
-        .poem-text { font-size: 1.3rem; line-height: 2.2; color: #ccc; font-style: italic; overflow: hidden; }
+        .poem-block::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 100, 177, 0.1), transparent);
+            transform: rotate(45deg); pointer-events: none;
+        }
 
-        /* --- 3D FLOAT GALLERY --- */
-        .gallery { display: flex; flex-wrap: wrap; gap: 40px; max-width: 1000px; perspective: 2000px; }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: 4rem; margin-bottom: 25px; color: var(--white); text-transform: uppercase; }
+        .poem-text { font-size: 1.4rem; line-height: 2.4; color: #b0b0b0; font-weight: 200; font-style: italic; }
+
+        /* --- HOLOGRAPHIC 3D PHOTO GALLERY --- */
+        .gallery { display: flex; flex-wrap: wrap; gap: 50px; max-width: 1200px; perspective: 2500px; }
         .panel:nth-child(even) .gallery { justify-content: flex-end; }
-        .panel:last-child .gallery { justify-content: center; max-width: 1400px; }
+        .panel:last-child .gallery { justify-content: center; max-width: 1600px; }
 
         .frame {
-            width: 280px; height: 380px; border-radius: 15px; padding: 12px;
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 300px; height: 400px; border-radius: 10px; padding: 15px;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            transform-style: preserve-3d; transition: border 0.3s;
         }
-        .frame.hovered {
-            transform: scale(1.08) translateY(-20px) !important;
-            border-color: rgba(0, 100, 177, 0.8);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 50px var(--uta-glow); z-index: 50;
+        .frame:hover { border-color: rgba(0, 100, 177, 0.6); z-index: 50; }
+        
+        .photo-inner {
+            width: 100%; height: 100%; border-radius: 5px; background-size: cover; background-position: center;
+            filter: grayscale(80%) brightness(0.7); transition: filter 0.5s ease;
+            transform: translateZ(30px); /* Pushes photo out from glass frame */
+            position: relative; overflow: hidden;
         }
-        .photo {
-            width: 100%; height: 100%; border-radius: 8px; background-size: cover; background-position: center;
-            filter: grayscale(40%) contrast(1.2); transition: filter 0.6s ease;
-        }
-        .frame.hovered .photo { filter: grayscale(0%) contrast(1.1); }
+        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); }
+
+        /* Holographic Glare Effect */
+        .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.4) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
+        .frame:hover .glare { transform: translateX(150%); }
 
     </style>
 </head>
@@ -137,7 +121,7 @@
     <div id="cursor-trail"></div>
 
     <div id="preloader">
-        <div id="load-text">IGNITING MEMORIES... <span id="percent">0</span>%</div>
+        <div id="load-text">INITIALIZING MAVERICK PROTOCOL <span id="percent">0</span>%</div>
         <div class="progress-bar"><div id="progress"></div></div>
         <button id="enter-btn">ENTER THE JOURNEY</button>
     </div>
@@ -147,37 +131,22 @@
     <main id="main-content">
         <section class="hero panel">
             <div>
-                <h1>Sai Srivalli Satya<br><span style="color: var(--uta-blue);">Yashashwini</span></h1>
-                <h2>(Yashu)</h2>
+                <h1 class="scramble-title">Sai Srivalli Satya<br><span style="color: var(--uta-blue);">Yashashwini</span></h1>
+                <h2 class="scramble-title">(Yashu)</h2>
             </div>
-            <div class="scroll-down">SCROLL TO EXPLORE</div>
+            <div class="scroll-down">ACTIVATE SCROLL</div>
         </section>
 
         <section class="panel chapter-trigger">
             <div class="chapter-container">
                 <div class="poem-block">
-                    <h2 class="chapter-title">Tiny Paws & Big Dreams</h2>
-                    <p class="poem-text split-text">A little bundle, full of zest,<br>Making the nursery the very best.<br>Surrounded by joy, completeness from the start,<br>Yashu's energy captured every heart.</p>
+                    <h2 class="chapter-title scramble-title">Tiny Paws & Big Dreams</h2>
+                    <p class="poem-text cipher-text" data-text="A little bundle, full of zest, Making the nursery the very best. Surrounded by joy, completeness from the start, Yashu's energy captured every heart."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('ch1_pic1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('ch1_pic2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch1_pic3.jpg');"></div></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="panel chapter-trigger">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title">Pigtails & Playtime</h2>
-                    <p class="poem-text split-text">Laughter echoes, world so bright,<br>Playing and growing in pure delight.<br>With pigtails bouncing, your presence so sweet,<br>Every childhood scene you made complete.</p>
-                </div>
-                <div class="gallery">
-                    <div class="frame interactable" data-speed="1.0"><div class="photo" style="background-image: url('ch2_pic1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('ch2_pic2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('ch2_pic3.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch2_pic4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -185,13 +154,14 @@
         <section class="panel chapter-trigger">
             <div class="chapter-container">
                 <div class="poem-block">
-                    <h2 class="chapter-title">Rebellious & Radiant</h2>
-                    <p class="poem-text split-text">Teenage spark, vibrant and wild,<br>Your inner bloom, never mild.<br>Rebellious spirit, heart ablaze,<br>Making surroundings shine in distinct ways.</p>
+                    <h2 class="chapter-title scramble-title">Pigtails & Playtime</h2>
+                    <p class="poem-text cipher-text" data-text="Laughter echoes, world so bright, Playing and growing in pure delight. With pigtails bouncing, your presence so sweet, Every childhood scene you made complete."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.4"><div class="photo" style="background-image: url('ch3_pic1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('ch3_pic2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('ch3_pic3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.0"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch2_pic4.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -199,14 +169,28 @@
         <section class="panel chapter-trigger">
             <div class="chapter-container">
                 <div class="poem-block">
-                    <h2 class="chapter-title">Finding Her Wings</h2>
-                    <p class="poem-text split-text">Soaring high, chasing each dream,<br>A radiant presence, a perfect team.<br>You make the world seem complete and whole,<br>With energy filling every role.</p>
+                    <h2 class="chapter-title scramble-title">Rebellious & Radiant</h2>
+                    <p class="poem-text cipher-text" data-text="Teenage spark, vibrant and wild, Your inner bloom, never mild. Rebellious spirit, heart ablaze, Making surroundings shine in distinct ways."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('ch4_pic1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('ch4_pic2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('ch4_pic3.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.0"><div class="photo" style="background-image: url('ch4_pic4.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.4"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel chapter-trigger">
+            <div class="chapter-container">
+                <div class="poem-block">
+                    <h2 class="chapter-title scramble-title">Finding Her Wings</h2>
+                    <p class="poem-text cipher-text" data-text="Soaring high, chasing each dream, A radiant presence, a perfect team. You make the world seem complete and whole, With energy filling every role."></p>
+                </div>
+                <div class="gallery">
+                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.0"><div class="photo-inner" style="background-image: url('ch4_pic4.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -214,35 +198,35 @@
         <section class="panel chapter-trigger" style="min-height: 180vh;">
             <div class="chapter-container">
                 <div class="poem-block" style="margin: 0 auto; text-align: center;">
-                    <h2 class="chapter-title">A Circle of Light</h2>
-                    <p class="poem-text split-text">A chosen family, a circle so bright,<br>Filling the days and the longest of nights.<br>With every shared secret and memories made,<br>A beautiful bond that will never fade.</p>
+                    <h2 class="chapter-title scramble-title">A Circle of Light</h2>
+                    <p class="poem-text cipher-text" data-text="A chosen family, a circle so bright, Filling the days and the longest of nights. With every shared secret and memories made, A beautiful bond that will never fade."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.5"><div class="photo" style="background-image: url('friends_1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.6"><div class="photo" style="background-image: url('friends_2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('friends_3.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('friends_4.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.4"><div class="photo" style="background-image: url('friends_5.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.9"><div class="photo" style="background-image: url('friends_6.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('friends_7.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.3"><div class="photo" style="background-image: url('friends_8.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.7"><div class="photo" style="background-image: url('friends_9.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.6"><div class="photo" style="background-image: url('friends_10.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.5"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.6"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.4"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.9"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.3"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.7"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.6"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
 
         <section class="panel chapter-trigger" style="padding-bottom: 20vh;">
             <div class="chapter-container">
-                <h1 style="font-family: 'Cinzel'; font-size: 5rem; text-shadow: 0 0 40px var(--uta-glow);">Happy Graduation, Yashu!</h1>
-                <div class="poem-block" style="border-color: var(--uta-blue);">
-                    <h2 class="chapter-title">The Maverick: UTA '26</h2>
-                    <p class="poem-text split-text" style="text-align: center;">UTA's proud maverick, shining on,<br>Making this place complete till you're gone.<br>Congratulations, Yashu, with energy so grand,<br>Emptiness gone where you now stand.</p>
+                <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: 6rem; text-shadow: 0 0 50px var(--uta-glow);">Happy Graduation, Yashu!</h1>
+                <div class="poem-block" style="border-top-color: var(--uta-blue);">
+                    <h2 class="chapter-title scramble-title">The Maverick: UTA '26</h2>
+                    <p class="poem-text cipher-text" style="text-align: center;" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
                 </div>
                 <div class="gallery">
-                    <div class="frame interactable" data-speed="1.2"><div class="photo" style="background-image: url('grad_1.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="0.8"><div class="photo" style="background-image: url('grad_2.jpg');"></div></div>
-                    <div class="frame interactable" data-speed="1.1"><div class="photo" style="background-image: url('grad_3.jpg');"></div></div>
+                    <div class="frame interactable" data-speed="1.2"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="0.8"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div>
+                    <div class="frame interactable" data-speed="1.1"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div>
                 </div>
             </div>
         </section>
@@ -252,7 +236,7 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ==========================================
-        // MAGNETIC CURSOR LOGIC
+        // MAGNETIC CURSOR & 3D HOVER PHYSICS
         // ==========================================
         const cursor = document.getElementById('cursor');
         const trail = document.getElementById('cursor-trail');
@@ -263,164 +247,213 @@
 
         function animateCursor() {
             cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
-            trailX += (mouseX - trailX) * 0.15; trailY += (mouseY - trailY) * 0.15; // Smooth trailing
+            trailX += (mouseX - trailX) * 0.15; trailY += (mouseY - trailY) * 0.15;
             trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
             requestAnimationFrame(animateCursor);
         }
         animateCursor();
 
-        // Cursor interacts with frames
-        document.querySelectorAll('.interactable').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'translate(-50%, -50%) scale(0)'; // Hide dot
-                trail.style.transform = 'translate(-50%, -50%) scale(2)'; // Expand circle
-                trail.style.borderColor = '#fff';
-                el.classList.add('hovered');
+        // Holographic 3D Tilt for Photos
+        document.querySelectorAll('.frame').forEach(frame => {
+            frame.addEventListener('mousemove', (e) => {
+                const rect = frame.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -15; // Max 15 deg tilt
+                const rotateY = ((x - centerX) / centerX) * 15;
+                frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                
+                cursor.style.transform = 'translate(-50%, -50%) scale(0)';
+                trail.style.transform = 'translate(-50%, -50%) scale(2.5)';
+                trail.style.borderColor = '#fff'; trail.style.background = 'rgba(255,255,255,0.1)';
             });
-            el.addEventListener('mouseleave', () => {
+            frame.addEventListener('mouseleave', () => {
+                frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
                 cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 trail.style.transform = 'translate(-50%, -50%) scale(1)';
-                trail.style.borderColor = 'rgba(0, 100, 177, 0.8)';
-                el.classList.remove('hovered');
+                trail.style.borderColor = 'rgba(0, 100, 177, 0.9)'; trail.style.background = 'transparent';
             });
         });
 
         // ==========================================
-        // THREE.JS: GLOWING GALAXY & BLOOM ENGINE
+        // THREE.JS: ZERO-MODEL QUANTUM WORLD
         // ==========================================
         const canvas = document.querySelector('#webgl-canvas');
-        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020202, 0.03);
+        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x010103, 0.02);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
-        camera.position.z = 20;
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 300);
+        camera.position.z = 25;
 
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Lights
-        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-        const blueLight = new THREE.PointLight(0x0064B1, 5, 100);
-        blueLight.position.set(-10, 10, 10); scene.add(blueLight);
+        // Lighting for Glass
+        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+        const blueLight = new THREE.PointLight(0x0064B1, 8, 100); blueLight.position.set(-10, 10, 5); scene.add(blueLight);
+        const whiteLight = new THREE.PointLight(0xffffff, 4, 100); whiteLight.position.set(10, -10, 5); scene.add(whiteLight);
 
-        // Particle Galaxy
-        const pCount = 5000;
+        // --- PROCEDURAL QUANTUM CAP (No external file needed) ---
+        const quantumGroup = new THREE.Group();
+        
+        // Advanced Frosted Glass Material
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0x0064B1, metalness: 0.1, roughness: 0.2, transmission: 0.9, thickness: 1.5,
+            clearcoat: 1.0, clearcoatRoughness: 0.1, wireframe: false
+        });
+        
+        // Glowing Wireframe Edge Material
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+
+        // 1. The Mortarboard (Top)
+        const boardGeo = new THREE.BoxGeometry(6, 0.1, 6);
+        const board = new THREE.Mesh(boardGeo, glassMat);
+        const boardEdges = new THREE.LineSegments(new THREE.EdgesGeometry(boardGeo), edgeMat);
+        board.add(boardEdges);
+
+        // 2. The Skullcap (Base)
+        const capGeo = new THREE.CylinderGeometry(2, 2.5, 2, 32);
+        const baseCap = new THREE.Mesh(capGeo, glassMat);
+        const capEdges = new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat);
+        baseCap.add(capEdges);
+        baseCap.position.y = -1;
+
+        quantumGroup.add(board, baseCap);
+        quantumGroup.position.set(5, -2, -5); // Start position
+        scene.add(quantumGroup);
+
+        // --- DYNAMIC KINETIC RINGS ---
+        const rings = [];
+        for(let i=0; i<3; i++) {
+            const ringGeo = new THREE.TorusGeometry(8 + (i*1.5), 0.02, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: i%2===0 ? 0x0064B1 : 0xffffff, transparent: true, opacity: 0.5 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.random() * Math.PI;
+            ring.rotation.y = Math.random() * Math.PI;
+            scene.add(ring);
+            rings.push({ mesh: ring, speedX: Math.random()*0.01, speedY: Math.random()*0.01 });
+        }
+
+        // --- PARTICLE VORTEX ---
+        const pCount = 6000;
         const pGeo = new THREE.BufferGeometry();
         const pPos = new Float32Array(pCount * 3);
         for(let i=0; i<pCount*3; i+=3){
-            let r = 15 + Math.random() * 50, theta = Math.random() * Math.PI * 2, phi = Math.acos((Math.random() * 2) - 1);
-            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 20;
+            let r = 20 + Math.random() * 60, theta = Math.random() * Math.PI * 2, phi = Math.acos((Math.random() * 2) - 1);
+            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 30;
         }
         pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-        const pMat = new THREE.PointsMaterial({ size: 0.2, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
-        const galaxy = new THREE.Points(pGeo, pMat); scene.add(galaxy);
+        const pMat = new THREE.PointsMaterial({ size: 0.15, color: 0x0064B1, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
 
-        // Post-Processing Bloom Pass
+        // --- INTERACTIVE EXPLOSION ON CLICK ---
+        window.addEventListener('click', () => {
+            gsap.to(pMat, { size: 0.5, opacity: 1, duration: 0.2, yoyo: true, repeat: 1 });
+            gsap.to(vortex.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.5, yoyo: true, repeat: 1, ease: "power4.out" });
+        });
+
+        // --- POST-PROCESSING EPIC BLOOM ---
         const renderScene = new THREE.RenderPass(scene, camera);
-        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        bloomPass.threshold = 0; bloomPass.strength = 1.2; bloomPass.radius = 0.5; // Epic Glow
-        
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2.0, 0.5, 0.85);
         const composer = new THREE.EffectComposer(renderer);
         composer.addPass(renderScene); composer.addPass(bloomPass);
 
-        // Load 3D Model with Preloader integration
-        let regaliaModel;
-        const loader = new THREE.GLTFLoader();
-        
-        // Simulating load for the cinematic preloader
+        // --- PRELOADER SEQUENCE ---
         let loadProgress = 0;
-        const percentTxt = document.getElementById('percent');
-        const progBar = document.getElementById('progress');
-        const enterBtn = document.getElementById('enter-btn');
-
         const fakeLoad = setInterval(() => {
-            loadProgress += Math.random() * 5;
+            loadProgress += Math.random() * 8;
             if(loadProgress >= 100) {
                 clearInterval(fakeLoad); loadProgress = 100;
-                enterBtn.classList.add('ready');
-                document.getElementById('load-text').innerHTML = "JOURNEY READY";
+                document.getElementById('enter-btn').classList.add('ready');
+                document.getElementById('load-text').innerHTML = "SYSTEM READY: PROCEED";
             }
-            percentTxt.innerText = Math.floor(loadProgress);
-            progBar.style.width = loadProgress + '%';
+            document.getElementById('percent').innerText = Math.floor(loadProgress);
+            document.getElementById('progress').style.width = loadProgress + '%';
         }, 100);
 
-        loader.load('uta_regalia.glb', (gltf) => {
-            regaliaModel = gltf.scene;
-            regaliaModel.position.set(6, -3, -5); regaliaModel.scale.set(1.8, 1.8, 1.8);
-            scene.add(regaliaModel);
-
-            // Cinematic 3D Path
-            const tl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1 } });
-            tl.to(regaliaModel.position, { x: -5, y: 1, z: 2 }, 0).to(regaliaModel.rotation, { y: Math.PI * 2, x: 0.3 }, 0)
-              .to(regaliaModel.position, { x: 5, y: -2, z: 8 }, 0.3).to(regaliaModel.rotation, { y: Math.PI * 4, x: -0.1 }, 0.3)
-              .to(regaliaModel.position, { x: 0, y: -1, z: -2 }, 0.7).to(regaliaModel.rotation, { y: Math.PI * 6, x: 0 }, 0.7);
-        });
-
-        // ==========================================
-        // BOOT SEQUENCE & GSAP ANIMATIONS
-        // ==========================================
-        enterBtn.addEventListener('click', () => {
-            document.getElementById('preloader').style.transform = 'translateY(-100%)';
-            document.getElementById('preloader').style.transition = 'transform 1s cubic-bezier(0.77, 0, 0.175, 1)';
-            document.body.style.overflowY = 'auto'; // Unlock scroll
-            document.querySelector('main').style.opacity = '1';
+        document.getElementById('enter-btn').addEventListener('click', () => {
+            gsap.to('#preloader', { yPercent: -100, duration: 1.5, ease: "power4.inOut" });
+            document.body.style.overflowY = 'auto';
+            gsap.to('main', { opacity: 1, duration: 2, delay: 0.5 });
             
-            // Play Audio
+            // Audio Start
             const audio = document.getElementById('bgm');
-            audio.volume = 0.5; audio.play().catch(e => console.log("Audio play prevented until interaction."));
+            audio.volume = 0.4; audio.play().catch(e => console.log("Audio ready."));
+
+            // Intro Animations
+            gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 1 });
         });
 
-        // Split-text hack for poems
-        document.querySelectorAll('.split-text').forEach(p => {
-            const words = p.innerHTML.split('<br>').map(line => 
-                line.split(' ').map(word => `<span style="opacity:0; display:inline-block; transform:translateY(10px);">${word}&nbsp;</span>`).join('')
-            ).join('<br>');
-            p.innerHTML = words;
-        });
+        // ==========================================
+        // SCROLL PHYSICS & CIPHER TEXT REVEAL
+        // ==========================================
+        
+        // Scroll the Quantum Cap
+        const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });
+        capTl.to(quantumGroup.position, { x: -6, y: 2, z: 5 }, 0).to(quantumGroup.rotation, { x: Math.PI/2, y: Math.PI }, 0)
+             .to(board.position, { y: 3 }, 0) /* Board floats off the cap */
+             .to(quantumGroup.position, { x: 6, y: -2, z: 10 }, 0.4).to(quantumGroup.rotation, { x: 0, y: Math.PI*2 }, 0.4)
+             .to(board.position, { y: 0 }, 0.4) /* Board snaps back */
+             .to(quantumGroup.position, { x: 0, y: 0, z: -5 }, 0.8).to(quantumGroup.rotation, { x: 0.2, y: Math.PI*4 }, 0.8);
+
+        // Cipher Text Decode Function
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+        function decodeText(element) {
+            const originalText = element.getAttribute('data-text');
+            let iterations = 0;
+            const interval = setInterval(() => {
+                element.innerText = originalText.split("").map((letter, index) => {
+                    if(index < iterations) return originalText[index];
+                    return letters[Math.floor(Math.random() * 26)];
+                }).join("");
+                if(iterations >= originalText.length) clearInterval(interval);
+                iterations += 1/3;
+            }, 30);
+        }
 
         const chapters = gsap.utils.toArray('.chapter-trigger');
         chapters.forEach((chapter) => {
             const block = chapter.querySelector('.poem-block');
-            const words = chapter.querySelectorAll('.split-text span');
+            const cipher = chapter.querySelector('.cipher-text');
             const frames = chapter.querySelectorAll('.frame');
 
-            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 75%" } });
+            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 70%" } });
 
-            if(block) tl.fromTo(block, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.5, ease: "power3.out" });
-            if(words.length) tl.to(words, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power2.out" }, "-=1");
+            if(block) tl.fromTo(block, { scale: 0.8, opacity: 0, rotationX: 20 }, { scale: 1, opacity: 1, rotationX: 0, duration: 1.5, ease: "expo.out" });
             
+            // Trigger Cipher effect when scrolled into view
+            ScrollTrigger.create({ trigger: chapter, start: "top 70%", onEnter: () => decodeText(cipher) });
+
             if(frames.length) {
                 tl.fromTo(frames, 
-                    { y: 300, z: -800, rotationX: 45, rotationY: () => Math.random() * 90 - 45, opacity: 0 },
-                    { y: 0, z: 0, rotationX: 0, rotationY: () => Math.random() * 10 - 5, opacity: 1, duration: 1.8, stagger: 0.1, ease: "power4.out" },
-                    "-=1.5"
+                    { y: 400, z: -1000, rotationX: 80, opacity: 0 },
+                    { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 2, stagger: 0.15, ease: "expo.out" }, "-=1.2"
                 );
-
                 frames.forEach(frame => {
-                    const speed = parseFloat(frame.getAttribute('data-speed')) || 1;
-                    gsap.to(frame, {
-                        y: () => -150 * speed, ease: "none",
-                        scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }
-                    });
+                    const speed = parseFloat(frame.getAttribute('data-speed'));
+                    gsap.to(frame, { y: () => -200 * speed, ease: "none", scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true }});
                 });
             }
         });
 
-        // Render Loop
+        // ==========================================
+        // RENDER ENGINE
+        // ==========================================
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
-            galaxy.rotation.y = time * 0.02; galaxy.rotation.x = time * 0.01;
             
-            // Camera subtle mouse follow
-            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 5 - camera.position.x) * 0.05;
-            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 5 - camera.position.y) * 0.05;
+            vortex.rotation.y = time * 0.03; vortex.rotation.x = time * 0.015;
+            
+            rings.forEach(r => { r.mesh.rotation.x += r.speedX; r.mesh.rotation.y += r.speedY; });
+            quantumGroup.position.y += Math.sin(time * 2) * 0.005;
+
+            camera.position.x += ((mouseX / window.innerWidth - 0.5) * 8 - camera.position.x) * 0.05;
+            camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 8 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
 
-            if(regaliaModel) regaliaModel.position.y += Math.sin(time * 2) * 0.005;
-
-            composer.render(); // Use composer for Bloom effect instead of normal renderer
+            composer.render();
         }
         animate();
 

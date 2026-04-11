@@ -19,22 +19,17 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
-        :root {
-            --uta-blue: #0064B1;
-            --uta-glow: rgba(0, 100, 177, 0.9);
-            --black: #020204;
-            --white: #ffffff;
-        }
+        :root { --uta-blue: #0064B1; --uta-glow: rgba(0, 100, 177, 0.9); --black: #020204; --white: #ffffff; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
         body { background-color: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow: hidden; }
 
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--black); }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--uta-blue); }
 
-        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--white); width: 0%; z-index: 10001; box-shadow: 0 0 15px var(--white); pointer-events: none; transition: background 0.5s; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--white); width: 0%; z-index: 10001; box-shadow: 0 0 15px var(--white); pointer-events: none; transition: background 0.5s; }
         
         #audio-toggle { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(10px); transition: all 0.3s ease; opacity: 0; pointer-events: none; }
         #audio-toggle.visible { opacity: 1; pointer-events: all; }
@@ -42,62 +37,88 @@
         #audio-toggle svg { width: 20px; height: 20px; fill: var(--white); transition: 0.3s; }
         #audio-toggle.muted svg { fill: #888; }
 
-        #cursor { position: fixed; width: 10px; height: 10px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.2s; }
-        #cursor-trail { position: fixed; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--white); box-shadow: 0 0 15px rgba(255,255,255,0.5); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.1s ease-out; }
+        #cursor { position: fixed; width: 8px; height: 8px; border-radius: 50%; background: var(--white); mix-blend-mode: difference; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.2s; }
+        #cursor-trail { position: fixed; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.5); pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: 0.15s ease-out; }
         @media (pointer: coarse) { * { cursor: auto !important; } #cursor, #cursor-trail { display: none !important; } }
 
-        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; perspective: 1000px; }
+        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .core { width: 60px; height: 60px; border: 2px solid var(--uta-blue); transform: rotate(45deg); animation: pulse-core 2s infinite ease-in-out; margin-bottom: 40px; box-shadow: 0 0 30px var(--uta-glow); transition: border-color 1s; }
         @keyframes pulse-core { 0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.8; } 50% { transform: rotate(45deg) scale(1.2); opacity: 1; box-shadow: 0 0 50px var(--uta-glow), inset 0 0 20px var(--uta-glow); } }
         
         #load-text { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 12px; color: #888; margin-bottom: 30px; text-transform: uppercase; text-align: center; }
-        #enter-btn { padding: 15px 60px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 5px; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.5s; pointer-events: none; text-transform: uppercase; }
+        #enter-btn { padding: 15px 60px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: var(--white); font-family: 'Montserrat', sans-serif; letter-spacing: 5px; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.5s; pointer-events: none; }
         #enter-btn.ready { opacity: 1; transform: translateY(0); pointer-events: all; border-color: var(--white); }
         #enter-btn.ready:hover { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 40px rgba(255,255,255,0.3) inset, 0 0 20px rgba(255,255,255,0.3); }
 
         #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
 
         main { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; opacity: 0; }
-        .panel { min-height: 100vh; width: 100%; max-width: 1600px; display: flex; align-items: center; padding: 15vh 5%; }
-
-        .hero { justify-content: center; text-align: center; height: 100vh; flex-direction: column; }
+        
+        .hero { min-height: 100vh; width: 100%; display: flex; justify-content: center; align-items: center; text-align: center; flex-direction: column; }
         .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 7.5rem); letter-spacing: 6px; line-height: 1.1; text-shadow: 0 0 50px var(--uta-glow); margin-bottom: 10px; transition: text-shadow 1s; }
         .hero h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 200; font-style: italic; letter-spacing: 4px; color: #ccc; }
         .scroll-down { position: absolute; bottom: 5vh; font-size: 0.8rem; letter-spacing: 8px; animation: pulse-text 2s infinite; opacity: 0.4; }
         @keyframes pulse-text { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; text-shadow: 0 0 10px var(--white); } }
 
-        .chapter-container { display: flex; flex-direction: column; width: 100%; gap: 6vh; z-index: 2; align-items: center; }
+        /* --- THE THREAD OF FATE TIMELINE --- */
+        .chapter-section { width: 100%; max-width: 1400px; display: flex; flex-direction: column; align-items: center; padding: 10vh 5%; position: relative; z-index: 2; }
         
         .poem-block {
-            max-width: 850px; width: 100%; background: rgba(8, 8, 12, 0.5);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            max-width: 900px; width: 100%; background: rgba(8, 8, 12, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: clamp(40px, 6vw, 60px) clamp(20px, 5vw, 60px); 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8); text-align: center; border-radius: 4px; transition: border-color 1s, box-shadow 1s;
+            padding: clamp(50px, 8vw, 80px) clamp(20px, 5vw, 60px); box-shadow: 0 40px 80px rgba(0,0,0,0.8); text-align: center; border-radius: 4px; transition: border-color 1s, box-shadow 1s;
+            margin-bottom: 15vh; /* Huge gap before timeline starts */
         }
         
-        .chap-num { font-size: 1rem; letter-spacing: 8px; color: var(--white); display: block; margin-bottom: 15px; font-weight: 600; font-family: 'Montserrat', sans-serif; text-shadow: 0 0 10px rgba(255,255,255,0.5); transition: color 1s, text-shadow 1s; }
-        .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 3.8rem); margin-bottom: 25px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.5); line-height: 1.1; }
-        .poem-text { font-size: clamp(1.1rem, 2vw, 1.4rem); line-height: 2.2; color: #e0e0e0; font-weight: 300; font-style: italic; }
+        .chap-num { font-size: 1rem; letter-spacing: 8px; color: var(--white); display: block; margin-bottom: 15px; font-weight: 600; text-shadow: 0 0 10px rgba(255,255,255,0.5); transition: color 1s, text-shadow 1s; }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 30px; color: var(--white); text-transform: uppercase; text-shadow: 0 5px 20px rgba(0,0,0,0.5); line-height: 1.1; }
+        .poem-text { font-size: clamp(1.2rem, 2.5vw, 1.6rem); line-height: 2.4; color: #e0e0e0; font-weight: 300; font-style: italic; overflow: hidden; }
 
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 60px; width: 100%; max-width: 1400px; perspective: 2000px; padding: 40px 0; place-items: center; }
-        .parallax-wrap { will-change: transform; width: 100%; display: flex; justify-content: center; }
+        /* The Vertical Line */
+        .timeline { position: relative; width: 100%; display: flex; flex-direction: column; gap: 15vh; padding: 5vh 0 20vh 0; }
+        .timeline::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3) 10%, rgba(255,255,255,0.3) 90%, transparent); transform: translateX(-50%); z-index: 0; }
 
-        .frame { width: 100%; max-width: 320px; aspect-ratio: 3/4; border-radius: 8px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px rgba(0,0,0,0.7); transition: border 0.4s ease; position: relative; }
+        .timeline-item { display: flex; justify-content: center; align-items: center; width: 100%; position: relative; z-index: 1; }
+        .timeline-item.left { justify-content: flex-start; padding-right: 55%; }
+        .timeline-item.right { justify-content: flex-end; padding-left: 55%; }
+
+        /* Glowing dot on the timeline */
+        .timeline-item::before {
+            content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 50%;
+            background: var(--white); box-shadow: 0 0 20px var(--white); transform: translate(-50%, -50%); z-index: 2;
+            opacity: 0.2; transition: opacity 0.5s;
+        }
+        .timeline-item.active-dot::before { opacity: 1; box-shadow: 0 0 30px var(--uta-glow), 0 0 10px var(--white); }
+
+        /* Mobile Timeline Fix */
+        @media (max-width: 900px) {
+            .timeline::before { left: 10%; }
+            .timeline-item.left, .timeline-item.right { justify-content: flex-end; padding: 0 0 0 20%; }
+            .timeline-item::before { left: 10%; }
+        }
+
+        .frame { width: 100%; max-width: 400px; aspect-ratio: 3/4; border-radius: 8px; padding: 15px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 30px 60px rgba(0,0,0,0.8); transition: border 0.4s ease; position: relative; }
         .frame:hover { border-color: rgba(255,255,255,0.8); z-index: 50; }
         
-        .photo-inner { width: 100%; height: 100%; border-radius: 4px; background-color: #111; background-size: cover; background-position: center; background-repeat: no-repeat; filter: grayscale(40%) brightness(0.8); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; }
-        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 30px rgba(255,255,255,0.3); transform: scale(1.03); }
+        .photo-inner { width: 100%; height: 100%; border-radius: 4px; background-color: #050505; background-size: cover; background-position: center; background-repeat: no-repeat; filter: grayscale(50%) brightness(0.7); transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; }
+        .frame:hover .photo-inner { filter: grayscale(0%) brightness(1.1); box-shadow: 0 0 40px rgba(255,255,255,0.2); transform: scale(1.02); }
 
-        .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
+        .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.2) 25%, transparent 30%); transform: translateX(-150%); transition: transform 0.6s; z-index: 2; pointer-events: none; }
         .frame:hover .glare { transform: translateX(150%); }
 
-        #lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); z-index: 100000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.98); backdrop-filter: blur(30px); z-index: 100000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
         #lightbox.active { opacity: 1; pointer-events: all; }
-        #lightbox-img { max-width: 90%; max-height: 90%; width: auto; height: auto; border-radius: 8px; box-shadow: 0 0 80px rgba(255,255,255, 0.5); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        #lightbox-img { max-width: 90%; max-height: 90%; width: auto; height: auto; border-radius: 4px; box-shadow: 0 0 100px rgba(255,255,255, 0.2); transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: contain; background-repeat: no-repeat; background-position: center; }
         #lightbox.active #lightbox-img { transform: scale(1); width: 85vw; height: 85vh; }
-        .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; color: #fff; opacity: 0.6; transition: 0.3s; padding: 20px; font-family: sans-serif; cursor: pointer !important; }
+        .close-btn { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; color: #fff; opacity: 0.4; transition: 0.3s; padding: 20px; font-family: sans-serif; cursor: pointer !important; }
         .close-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+        /* The Finale Button */
+        .finale-btn-wrap { display: flex; justify-content: center; width: 100%; padding-top: 10vh; }
+        .finale-btn { padding: 25px 60px; font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--white); background: transparent; border: 1px solid rgba(255,255,255,0.3); letter-spacing: 5px; text-transform: uppercase; position: relative; overflow: hidden; transition: 0.5s; box-shadow: 0 0 20px rgba(255,255,255,0); }
+        .finale-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s; }
+        .finale-btn:hover { border-color: var(--white); box-shadow: 0 0 40px rgba(255,255,255,0.3); transform: scale(1.05); }
+        .finale-btn:hover::before { left: 100%; }
 
     </style>
 </head>
@@ -107,7 +128,6 @@
     <div id="audio-toggle" class="interactable">
         <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
     </div>
-    
     <audio id="bgm" loop crossorigin="anonymous"><source src="bg-music.mp3" type="audio/mpeg"></audio>
 
     <div id="cursor"></div>
@@ -132,100 +152,92 @@
             <div class="scroll-down">COMMENCE SCROLL</div>
         </section>
 
-        <section class="panel chapter-trigger" data-color="#ffb6c1">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 1</span>Tiny Paws & Big Dreams</h2>
-                    <p class="poem-text cipher-text" data-text="A little bundle, full of zest, Making the nursery the very best. Surrounded by joy, completeness from the start, Yashu's energy captured every heart."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="-1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic5.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic6.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" data-color="#ffb6c1">
+            <div class="poem-block">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 1</span>Tiny Paws & Big Dreams</h2>
+                <p class="poem-text scrub-text">A little bundle, full of zest, Making the nursery the very best. Surrounded by joy, completeness from the start, Yashu's energy captured every heart.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic3.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic4.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic5.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch1_pic6.jpg');"><div class="glare"></div></div></div></div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" data-color="#FFD700">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 2</span>Pigtails & Playtime</h2>
-                    <p class="poem-text cipher-text" data-text="Laughter echoes, world so bright, Playing and growing in pure delight. With pigtails bouncing, your presence so sweet, Every childhood scene you made complete."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic4.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" data-color="#FFD700">
+            <div class="poem-block">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 2</span>Pigtails & Playtime</h2>
+                <p class="poem-text scrub-text">Laughter echoes, world so bright, Playing and growing in pure delight. With pigtails bouncing, your presence so sweet, Every childhood scene you made complete.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic3.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch2_pic4.jpg');"><div class="glare"></div></div></div></div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" data-color="#8A2BE2">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 3</span>Rebellious & Radiant</h2>
-                    <p class="poem-text cipher-text" data-text="Teenage spark, vibrant and wild, Your inner bloom, never mild. Rebellious spirit, heart ablaze, Making surroundings shine in distinct ways."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic4.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" data-color="#8A2BE2">
+            <div class="poem-block">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 3</span>Rebellious & Radiant</h2>
+                <p class="poem-text scrub-text">Teenage spark, vibrant and wild, Your inner bloom, never mild. Rebellious spirit, heart ablaze, Making surroundings shine in distinct ways.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic3.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch3_pic4.jpg');"><div class="glare"></div></div></div></div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" data-color="#00CED1">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 4</span>Finding Her Wings</h2>
-                    <p class="poem-text cipher-text" data-text="Soaring high, chasing each dream, A radiant presence, a perfect team. You make the world seem complete and whole, With energy filling every role."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" data-color="#00CED1">
+            <div class="poem-block">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 4</span>Finding Her Wings</h2>
+                <p class="poem-text scrub-text">Soaring high, chasing each dream, A radiant presence, a perfect team. You make the world seem complete and whole, With energy filling every role.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('ch4_pic3.jpg');"><div class="glare"></div></div></div></div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" data-color="#E0E0E0">
-            <div class="chapter-container">
-                <div class="poem-block">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 5</span>A Circle of Light</h2>
-                    <p class="poem-text cipher-text" data-text="A chosen family, a circle so bright, Filling the days and the longest of nights. With every shared secret and memories made, A beautiful bond that will never fade."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="0.8"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-0.7"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.4"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="0.7"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-0.9"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" data-color="#E0E0E0">
+            <div class="poem-block">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">CHAPTER 5</span>A Circle of Light</h2>
+                <p class="poem-text scrub-text">A chosen family, a circle so bright, Filling the days and the longest of nights. With every shared secret and memories made, A beautiful bond that will never fade.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_3.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_4.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_5.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_6.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_7.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_8.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_9.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('friends_10.jpg');"><div class="glare"></div></div></div></div>
             </div>
         </section>
 
-        <section class="panel chapter-trigger" style="padding-bottom: 25vh;" data-color="#0064B1">
-            <div class="chapter-container">
-                <h1 class="scramble-title grad-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center;">Happy Graduation, Yashu!</h1>
-                <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
-                    <h2 class="chapter-title scramble-title"><span class="chap-num">FINALE</span>The Maverick: UTA '26</h2>
-                    <p class="poem-text cipher-text" data-text="UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand."></p>
-                </div>
-                <div class="gallery">
-                    <div class="parallax-wrap" data-speed="1.2"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="-1.1"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div></div>
-                    <div class="parallax-wrap" data-speed="1.3"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div></div>
-                </div>
+        <section class="chapter-section panel" style="padding-bottom: 25vh;" data-color="#0064B1">
+            <h1 class="scramble-title" style="font-family: 'Cinzel'; font-size: clamp(3rem, 6vw, 6rem); text-shadow: 0 0 50px var(--uta-glow); text-align: center; margin-bottom: 5vh;">Happy Graduation, Yashu!</h1>
+            <div class="poem-block" style="border-top-color: var(--uta-blue); box-shadow: 0 0 60px rgba(0, 100, 177, 0.3);">
+                <h2 class="chapter-title scramble-title"><span class="chap-num">FINALE</span>The Maverick: UTA '26</h2>
+                <p class="poem-text scrub-text" style="text-align: center;">UTA's proud maverick, shining on, Making this place complete till you're gone. Congratulations, Yashu, with energy so grand, Emptiness gone where you now stand.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_1.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item right"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_2.jpg');"><div class="glare"></div></div></div></div>
+                <div class="timeline-item left"><div class="frame interactable"><div class="photo-inner" style="background-image: url('grad_3.jpg');"><div class="glare"></div></div></div></div>
+            </div>
+            
+            <div class="finale-btn-wrap">
+                <button class="finale-btn interactable" onclick="triggerFinale()">Claim The Future</button>
             </div>
         </section>
     </main>
@@ -236,311 +248,181 @@
         // ==========================================
         // UI & INTERACTION LOGIC
         // ==========================================
-        const cursor = document.getElementById('cursor');
-        const trail = document.getElementById('cursor-trail');
+        const cursor = document.getElementById('cursor'); const trail = document.getElementById('cursor-trail');
         const isTouch = window.matchMedia("(pointer: coarse)").matches;
-        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-        let trailX = mouseX, trailY = mouseY;
+        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2; let trailX = mouseX, trailY = mouseY;
 
         if (!isTouch) {
             document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-            function animateCursor() {
-                cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`;
-                trailX += (mouseX - trailX) * 0.2; trailY += (mouseY - trailY) * 0.2;
-                trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`;
-                requestAnimationFrame(animateCursor);
-            }
+            function animateCursor() { cursor.style.left = `${mouseX}px`; cursor.style.top = `${mouseY}px`; trailX += (mouseX - trailX) * 0.2; trailY += (mouseY - trailY) * 0.2; trail.style.left = `${trailX}px`; trail.style.top = `${trailY}px`; requestAnimationFrame(animateCursor); }
             animateCursor();
         }
 
         document.querySelectorAll('.interactable').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                if(isTouch) return;
-                cursor.style.transform = 'translate(-50%, -50%) scale(0)';
-                trail.style.transform = 'translate(-50%, -50%) scale(2.5)';
-                trail.style.background = 'rgba(255,255,255,0.05)'; trail.style.borderColor = '#fff';
-            });
-            el.addEventListener('mouseleave', () => {
-                if(isTouch) return;
-                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-                trail.style.transform = 'translate(-50%, -50%) scale(1)';
-                trail.style.background = 'transparent'; 
-                // Color resets are handled dynamically below now
-            });
+            el.addEventListener('mouseenter', () => { if(isTouch) return; cursor.style.transform = 'translate(-50%, -50%) scale(0)'; trail.style.transform = 'translate(-50%, -50%) scale(2.5)'; trail.style.background = 'rgba(255,255,255,0.05)'; trail.style.borderColor = '#fff'; });
+            el.addEventListener('mouseleave', () => { if(isTouch) return; cursor.style.transform = 'translate(-50%, -50%) scale(1)'; trail.style.transform = 'translate(-50%, -50%) scale(1)'; trail.style.background = 'transparent'; });
         });
 
         document.querySelectorAll('.frame').forEach(frame => {
-            frame.addEventListener('mousemove', (e) => {
-                if (isTouch) return;
-                const rect = frame.getBoundingClientRect();
-                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const rotateX = ((y - rect.height/2) / (rect.height/2)) * -12;
-                const rotateY = ((x - rect.width/2) / (rect.width/2)) * 12;
-                frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-            });
-            frame.addEventListener('mouseleave', () => {
-                if (isTouch) return;
-                frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-            });
+            frame.addEventListener('mousemove', (e) => { if (isTouch) return; const rect = frame.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; const rotateX = ((y - rect.height/2) / (rect.height/2)) * -12; const rotateY = ((x - rect.width/2) / (rect.width/2)) * 12; frame.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`; });
+            frame.addEventListener('mouseleave', () => { if (isTouch) return; frame.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`; });
         });
 
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        
-        document.querySelectorAll('.photo-inner').forEach(photo => {
-            photo.addEventListener('click', () => {
-                lightboxImg.style.backgroundImage = photo.style.backgroundImage;
-                lightbox.classList.add('active'); document.body.style.overflowY = 'hidden'; 
-            });
-        });
-        lightbox.addEventListener('click', () => {
-            lightbox.classList.remove('active'); document.body.style.overflowY = 'auto';
-        });
-
-        // ==========================================
-        // 3D WORLD PHYSICS
-        // ==========================================
-        const canvas = document.querySelector('#webgl-canvas');
-        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020204, 0.015);
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 300);
-        camera.position.z = 30;
-
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
-        
-        // Dynamic Lights that will change color
-        const mainLight = new THREE.PointLight(0x0064B1, 10, 100); mainLight.position.set(-15, 10, 5); scene.add(mainLight);
-        const accentLight = new THREE.PointLight(0xffffff, 5, 100); accentLight.position.set(15, -15, 5); scene.add(accentLight);
-
-        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x004a8c, metalness: 0.2, roughness: 0.1, transmission: 0.95, thickness: 2.5, clearcoat: 1.0, clearcoatRoughness: 0.1, ior: 1.5, side: THREE.DoubleSide });
-        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
-
-        const quantumGroup = new THREE.Group();
-        const boardGeo = new THREE.BoxGeometry(7, 0.2, 7);
-        const board = new THREE.Mesh(boardGeo, glassMat);
-        board.add(new THREE.LineSegments(new THREE.EdgesGeometry(boardGeo), edgeMat));
-
-        const capGeo = new THREE.CylinderGeometry(2.5, 3, 2.5, 32);
-        const baseCap = new THREE.Mesh(capGeo, glassMat);
-        baseCap.add(new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat));
-        baseCap.position.y = -1.2;
-
-        // Interactive Rings
-        const rings = [];
-        for(let i=0; i<2; i++) {
-            const rGeo = new THREE.TorusGeometry(6 + (i*2), 0.05, 16, 100);
-            const rMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 });
-            const ring = new THREE.Mesh(rGeo, rMat);
-            ring.rotation.x = Math.random() * Math.PI;
-            quantumGroup.add(ring);
-            rings.push(ring);
-        }
-
-        quantumGroup.add(board, baseCap);
-        quantumGroup.position.set(7, -3, -5); 
-        scene.add(quantumGroup);
-
-        const pGeo = new THREE.BufferGeometry();
-        const particleCount = isTouch ? 2500 : 6000;
-        const pPos = new Float32Array(particleCount * 3);
-        for(let i=0; i<particleCount*3; i+=3){
-            let r = 25 + Math.random() * 80, theta = Math.random() * Math.PI*2, phi = Math.acos((Math.random()*2)-1);
-            pPos[i] = r * Math.sin(phi) * Math.cos(theta); pPos[i+1] = r * Math.sin(phi) * Math.sin(theta); pPos[i+2] = r * Math.cos(phi) - 40;
-        }
-        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-        const pMat = new THREE.PointsMaterial({ size: 0.15, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
-        const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
-
-        const renderScene = new THREE.RenderPass(scene, camera);
-        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85);
-        const composer = new THREE.EffectComposer(renderer);
-        composer.addPass(renderScene); composer.addPass(bloomPass);
-
-        // ==========================================
-        // WEB AUDIO API: THE REACTIVE UNIVERSE
-        // ==========================================
-        const audioBtn = document.getElementById('audio-toggle');
-        const bgMusic = document.getElementById('bgm');
-        let isMuted = false;
-        
-        let audioCtx, analyser, dataArray;
-        let isAudioInit = false;
+        const audioBtn = document.getElementById('audio-toggle'); const bgMusic = document.getElementById('bgm'); let isMuted = false;
+        let audioCtx, analyser, dataArray; let isAudioInit = false;
 
         function initAudio() {
             if(isAudioInit) return;
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaElementSource(bgMusic);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                analyser.fftSize = 256;
-                const bufferLength = analyser.frequencyBinCount;
-                dataArray = new Uint8Array(bufferLength);
-                isAudioInit = true;
-            } catch (e) {
-                console.log("Audio API blocked or not supported", e);
-            }
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioCtx.createAnalyser(); const source = audioCtx.createMediaElementSource(bgMusic); source.connect(analyser); analyser.connect(audioCtx.destination); analyser.fftSize = 256; dataArray = new Uint8Array(analyser.frequencyBinCount); isAudioInit = true; } catch (e) { console.log("Audio API blocked", e); }
         }
 
         audioBtn.addEventListener('click', () => {
             isMuted = !isMuted;
-            if(isMuted) {
-                bgMusic.pause(); audioBtn.classList.add('muted');
-                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
-            } else {
-                bgMusic.play(); audioBtn.classList.remove('muted');
-                if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
-            }
+            if(isMuted) { bgMusic.pause(); audioBtn.classList.add('muted'); audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'; } 
+            else { bgMusic.play(); audioBtn.classList.remove('muted'); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>'; }
+        });
+
+        const lightbox = document.getElementById('lightbox'); const lightboxImg = document.getElementById('lightbox-img');
+        document.querySelectorAll('.photo-inner').forEach(photo => { photo.addEventListener('click', () => { lightboxImg.style.backgroundImage = photo.style.backgroundImage; lightbox.classList.add('active'); document.body.style.overflowY = 'hidden'; }); });
+        lightbox.addEventListener('click', () => { lightbox.classList.remove('active'); document.body.style.overflowY = 'auto'; });
+
+        // Scroll Physics
+        let scrollVelocity = 0; let lastY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('scroll-progress').style.width = (winScroll / height) * 100 + "%";
+            
+            // Track Speed for Warp Drive effect
+            scrollVelocity = Math.abs(window.scrollY - lastY);
+            lastY = window.scrollY;
         });
 
         // ==========================================
-        // ANIMATION SEQUENCES
+        // 3D WORLD: KINETIC PHYSICS
         // ==========================================
-        let loadProgress = 0;
-        const fakeLoad = setInterval(() => {
-            loadProgress += Math.random() * 12;
-            if(loadProgress >= 100) {
-                clearInterval(fakeLoad); loadProgress = 100;
-                document.getElementById('enter-btn').classList.add('ready');
-                document.getElementById('load-text').innerHTML = "SYSTEM READY";
-            }
-            document.getElementById('percent').innerText = Math.floor(loadProgress);
-        }, 100);
+        const canvas = document.querySelector('#webgl-canvas');
+        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020204, 0.015);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500); camera.position.z = 30;
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+        const mainLight = new THREE.PointLight(0x0064B1, 10, 100); mainLight.position.set(-15, 10, 5); scene.add(mainLight);
+        const accentLight = new THREE.PointLight(0xffffff, 5, 100); accentLight.position.set(15, -15, 5); scene.add(accentLight);
+
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x004a8c, metalness: 0.2, roughness: 0.1, transmission: 0.95, thickness: 2.5, clearcoat: 1.0, ior: 1.5, side: THREE.DoubleSide });
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
+
+        const quantumGroup = new THREE.Group();
+        const boardGeo = new THREE.BoxGeometry(7, 0.2, 7); const board = new THREE.Mesh(boardGeo, glassMat); board.add(new THREE.LineSegments(new THREE.EdgesGeometry(boardGeo), edgeMat));
+        const capGeo = new THREE.CylinderGeometry(2.5, 3, 2.5, 32); const baseCap = new THREE.Mesh(capGeo, glassMat); baseCap.add(new THREE.LineSegments(new THREE.EdgesGeometry(capGeo), edgeMat)); baseCap.position.y = -1.2;
+        
+        const rings = [];
+        for(let i=0; i<2; i++) { const rGeo = new THREE.TorusGeometry(6+(i*2), 0.05, 16, 100); const rMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 }); const ring = new THREE.Mesh(rGeo, rMat); ring.rotation.x = Math.random()*Math.PI; quantumGroup.add(ring); rings.push(ring); }
+
+        quantumGroup.add(board, baseCap); quantumGroup.position.set(7, -3, -5); scene.add(quantumGroup);
+
+        const pGeo = new THREE.BufferGeometry(); const particleCount = isTouch ? 2500 : 5000; const pPos = new Float32Array(particleCount * 3);
+        for(let i=0; i<particleCount*3; i+=3){ let r = 30 + Math.random()*100, theta = Math.random()*Math.PI*2, phi = Math.acos((Math.random()*2)-1); pPos[i] = r*Math.sin(phi)*Math.cos(theta); pPos[i+1] = r*Math.sin(phi)*Math.sin(theta); pPos[i+2] = r*Math.cos(phi) - 50; }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({ size: 0.2, color: 0x0064B1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+        const vortex = new THREE.Points(pGeo, pMat); scene.add(vortex);
+
+        const renderScene = new THREE.RenderPass(scene, camera); const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85); const composer = new THREE.EffectComposer(renderer); composer.addPass(renderScene); composer.addPass(bloomPass);
+
+        // ==========================================
+        // GSAP: TIMELINES & SCROLL MAGIC
+        // ==========================================
+        let loadProgress = 0; const fakeLoad = setInterval(() => { loadProgress += Math.random()*12; if(loadProgress>=100){ clearInterval(fakeLoad); loadProgress=100; document.getElementById('enter-btn').classList.add('ready'); document.getElementById('load-text').innerHTML = "SYSTEM READY"; } document.getElementById('percent').innerText = Math.floor(loadProgress); }, 100);
 
         document.getElementById('enter-btn').addEventListener('click', () => {
-            gsap.to('#preloader', { scale: 3, opacity: 0, filter: "blur(20px)", duration: 1.5, ease: "power4.inOut", onComplete: () => {
-                document.getElementById('preloader').style.display = 'none';
-                document.body.style.overflowY = 'auto';
-            }});
-            gsap.to('main', { opacity: 1, duration: 2, delay: 0.5 });
-            audioBtn.classList.add('visible');
-            
-            initAudio();
-            bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
-            
+            gsap.to('#preloader', { scale: 3, opacity: 0, filter: "blur(20px)", duration: 1.5, ease: "power4.inOut", onComplete: () => { document.getElementById('preloader').style.display = 'none'; document.body.style.overflowY = 'auto'; }});
+            gsap.to('main', { opacity: 1, duration: 2, delay: 0.5 }); audioBtn.classList.add('visible'); initAudio(); bgMusic.volume = 0.5; bgMusic.play().catch(e=>{});
             gsap.from('.scramble-title', { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.8 });
-            initAmbientFloat();
         });
 
-        function initAmbientFloat() {
-            gsap.utils.toArray('.parallax-wrap').forEach(wrap => {
-                gsap.to(wrap, { y: `+=${Math.random() * 4 - 2}`, x: `+=${Math.random() * 4 - 2}`, rotationZ: Math.random() * 1 - 0.5, duration: Math.random() * 2 + 3, yoyo: true, repeat: -1, ease: "sine.inOut", delay: Math.random() * 2 });
-            });
-        }
+        // Split text for scrub reading
+        document.querySelectorAll('.scrub-text').forEach(p => {
+            const text = p.innerText; p.innerHTML = '';
+            text.split(' ').forEach(word => { const span = document.createElement('span'); span.innerText = word + ' '; span.style.opacity = 0.1; p.appendChild(span); });
+        });
 
-        const capTl = gsap.timeline({ scrollTrigger: { trigger: "main", start: "top top", end: "bottom bottom", scrub: 1.5 } });
-        capTl.to(quantumGroup.position, { x: -8, y: 3, z: 2 }, 0).to(quantumGroup.rotation, { x: Math.PI/1.5, y: Math.PI }, 0)
-             .to(board.position, { y: 4 }, 0).to(quantumGroup.position, { x: 8, y: -2, z: 8 }, 0.4).to(quantumGroup.rotation, { x: -0.2, y: Math.PI*2 }, 0.4)
-             .to(board.position, { y: 0 }, 0.4).to(quantumGroup.position, { x: 0, y: 0, z: -8 }, 0.8).to(quantumGroup.rotation, { x: 0.3, y: Math.PI*4 }, 0.8);
-
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        function decodeText(element) {
-            if(element.decoded) return; element.decoded = true;
-            const original = element.getAttribute('data-text'); let iter = 0;
-            const int = setInterval(() => {
-                element.innerText = original.split("").map((l, i) => i < iter ? original[i] : letters[Math.floor(Math.random()*36)]).join("");
-                if(iter >= original.length) clearInterval(int); iter += 1/3;
-            }, 30);
-        }
-
-        // --- EMOTIONAL COLOR GRADING ---
         const panels = gsap.utils.toArray('.panel');
-        panels.forEach((panel, i) => {
+        panels.forEach((panel) => {
             const color = panel.getAttribute('data-color');
-            if(color) {
-                ScrollTrigger.create({
-                    trigger: panel,
-                    start: "top 50%",
-                    end: "bottom 50%",
-                    onEnter: () => changeTheme(color),
-                    onEnterBack: () => changeTheme(color)
-                });
-            }
+            if(color) { ScrollTrigger.create({ trigger: panel, start: "top 50%", end: "bottom 50%", onEnter: () => changeTheme(color), onEnterBack: () => changeTheme(color) }); }
         });
 
         function changeTheme(hexCode) {
             const color = new THREE.Color(hexCode);
-            gsap.to(mainLight.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 });
-            gsap.to(pMat.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 });
-            gsap.to(glassMat.color, { r: color.r * 0.7, g: color.g * 0.7, b: color.b * 0.7, duration: 1.5 });
-            document.documentElement.style.setProperty('--uta-blue', hexCode);
-            document.documentElement.style.setProperty('--uta-glow', `${hexCode}99`);
-            document.getElementById('scroll-progress').style.background = hexCode;
-            document.getElementById('cursor-trail').style.borderColor = hexCode;
+            gsap.to(mainLight.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 }); gsap.to(pMat.color, { r: color.r, g: color.g, b: color.b, duration: 1.5 }); gsap.to(glassMat.color, { r: color.r*0.7, g: color.g*0.7, b: color.b*0.7, duration: 1.5 });
+            document.documentElement.style.setProperty('--uta-blue', hexCode); document.documentElement.style.setProperty('--uta-glow', `${hexCode}99`); document.getElementById('scroll-progress').style.background = hexCode; document.getElementById('cursor-trail').style.borderColor = hexCode;
         }
 
-        document.querySelectorAll('.chapter-trigger').forEach((chapter) => {
+        document.querySelectorAll('.chapter-section').forEach((chapter) => {
             const block = chapter.querySelector('.poem-block');
-            const cipher = chapter.querySelector('.cipher-text');
-            const parallaxWraps = chapter.querySelectorAll('.parallax-wrap');
+            const words = chapter.querySelectorAll('.scrub-text span');
+            const timelineItems = chapter.querySelectorAll('.timeline-item');
 
-            const tl = gsap.timeline({ scrollTrigger: { trigger: chapter, start: "top 75%" } });
-            if(block) tl.fromTo(block, { scale: 0.85, opacity: 0, y: 50 }, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: "expo.out" });
-            ScrollTrigger.create({ trigger: chapter, start: "top 70%", onEnter: () => decodeText(cipher) });
+            // Float up the text box
+            gsap.fromTo(block, { scale: 0.9, opacity: 0, y: 50 }, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: "expo.out", scrollTrigger: { trigger: chapter, start: "top 80%" } });
+            
+            // Scrub the text based on scrolling
+            gsap.to(words, { opacity: 1, stagger: 0.1, scrollTrigger: { trigger: block, start: "top 70%", end: "bottom 50%", scrub: 1 } });
 
-            if(parallaxWraps.length) {
-                tl.fromTo(parallaxWraps, { y: 200, z: -500, rotationX: 45, opacity: 0 }, { y: 0, z: 0, rotationX: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=1");
-                parallaxWraps.forEach(wrap => {
-                    const speed = parseFloat(wrap.getAttribute('data-speed'));
-                    gsap.to(wrap, { y: () => -100 * speed, ease: "none", scrollTrigger: { trigger: chapter, start: "top bottom", end: "bottom top", scrub: true } });
-                });
-            }
+            // Animate Timeline Items left/right
+            timelineItems.forEach(item => {
+                const isLeft = item.classList.contains('left');
+                gsap.fromTo(item.querySelector('.frame'), 
+                    { x: isLeft ? -100 : 100, opacity: 0, rotationY: isLeft ? -20 : 20 },
+                    { x: 0, opacity: 1, rotationY: 0, duration: 1.2, ease: "back.out(1.2)", scrollTrigger: { trigger: item, start: "top 80%" } }
+                );
+                // Trigger the glowing dot connection
+                ScrollTrigger.create({ trigger: item, start: "center 60%", onEnter: () => item.classList.add('active-dot'), onLeaveBack: () => item.classList.remove('active-dot') });
+            });
         });
 
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('scroll-progress').style.width = scrolled + "%";
-        });
+        function triggerFinale() {
+            gsap.to('.finale-btn', { scale: 0, opacity: 0, duration: 0.5 });
+            gsap.to(vortex.scale, { x: 5, y: 5, z: 5, duration: 3, ease: "power2.in" });
+            gsap.to(quantumGroup.position, { z: 50, duration: 3, ease: "power2.in" });
+            setTimeout(() => { alert("This is where the future begins, Yashu. \n(Dhrumil, you can link this button to a special video or another page!)"); }, 2000);
+        }
 
         // ==========================================
-        // RENDER LOOP WITH AUDIO ANALYSIS
+        // RENDER LOOP & WARP PHYSICS
         // ==========================================
         const clock = new THREE.Clock();
         function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
+            requestAnimationFrame(animate); const time = clock.getElapsedTime();
             
             // Audio Reactivity
-            let bassScale = 1;
-            if (isAudioInit && !isMuted) {
-                analyser.getByteFrequencyData(dataArray);
-                let bass = 0;
-                for(let i=0; i<10; i++) bass += dataArray[i]; // Sample low frequencies
-                bassScale = 1 + (bass / 2550) * 0.3; // Scale up to 30% larger based on bass
-            }
+            let bassScale = 1; if (isAudioInit && !isMuted) { analyser.getByteFrequencyData(dataArray); let bass = 0; for(let i=0; i<10; i++) bass += dataArray[i]; bassScale = 1 + (bass/2550)*0.3; }
 
-            // Apply music pulse to vortex and rings
-            vortex.scale.set(bassScale, bassScale, bassScale);
-            rings.forEach((r, i) => {
-                r.scale.set(bassScale, bassScale, bassScale);
-                r.rotation.x += 0.01 * (i+1);
-                r.rotation.y += 0.02 * (i+1);
-            });
+            // Warp Drive Kinetic Physics
+            scrollVelocity *= 0.9; // Friction decay
+            const speedFactor = 1 + (scrollVelocity * 0.05);
+            
+            vortex.scale.set(bassScale, bassScale, bassScale * speedFactor); // Particles stretch on Z axis when scrolling
+            pMat.size = 0.15 + (scrollVelocity * 0.005); // Glow brighter when scrolling
 
-            vortex.rotation.y = time * 0.02; vortex.rotation.x = time * 0.01;
-            quantumGroup.position.y += Math.sin(time * 2) * 0.005;
+            rings.forEach((r, i) => { r.scale.set(bassScale, bassScale, bassScale); r.rotation.x += 0.01*(i+1); r.rotation.y += 0.02*(i+1); });
+            
+            vortex.rotation.y = time * 0.015; vortex.rotation.x = time * 0.005;
+            vortex.position.z += scrollVelocity * 0.1; // Push particles back slightly when scrolling for 3D depth
+            if(vortex.position.z > 20) vortex.position.z = 0; // Reset loop
 
-            if (!isTouch) {
-                camera.position.x += ((mouseX / window.innerWidth - 0.5) * 6 - camera.position.x) * 0.05;
-                camera.position.y += (-(mouseY / window.innerHeight - 0.5) * 6 - camera.position.y) * 0.05;
-            }
-            camera.lookAt(scene.position);
+            quantumGroup.position.y += Math.sin(time*2)*0.005;
+            quantumGroup.rotation.y += scrollVelocity * 0.001; // Cap spins faster when scrolling
 
-            composer.render();
+            if (!isTouch) { camera.position.x += ((mouseX/window.innerWidth - 0.5)*6 - camera.position.x)*0.05; camera.position.y += (-(mouseY/window.innerHeight - 0.5)*6 - camera.position.y)*0.05; }
+            camera.lookAt(scene.position); composer.render();
         }
         animate();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight);
-        });
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight); });
     </script>
 </body>
 </html>

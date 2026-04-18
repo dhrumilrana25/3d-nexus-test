@@ -15,21 +15,16 @@
       --bg: #02040a;
       --bg-2: #06101c;
       --bg-3: #0b1a31;
-      --bg-4: #10284c;
-      --panel: rgba(255, 255, 255, 0.07);
-      --panel-strong: rgba(255, 255, 255, 0.12);
       --text: #f8fbff;
       --muted: #c9d8ea;
       --soft: #95afcb;
       --line: rgba(255, 255, 255, 0.14);
       --blue: #9ad0ff;
       --blue-strong: #63b4ff;
-      --highlight: #e8f5ff;
       --shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
       --radius-xl: 30px;
       --radius-lg: 22px;
-      --radius-md: 16px;
-      --content: 1200px;
+      --content: 1180px;
       --nav-bg: rgba(2, 6, 12, 0.56);
     }
 
@@ -150,10 +145,7 @@
       box-shadow: 0 30px 90px rgba(0,0,0,0.45);
     }
 
-    .intro-content .pill {
-      margin-bottom: 18px;
-    }
-
+    .intro-content .pill { margin-bottom: 18px; }
     .intro-content h1 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(3.2rem, 8vw, 6.4rem);
@@ -170,22 +162,34 @@
       font-size: 1.04rem;
     }
 
-    .intro-button {
-      padding: 16px 26px;
+    .intro-button,
+    .button,
+    .ghost-button,
+    .music-btn,
+    .video-trigger {
       border: none;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+    }
+
+    .intro-button,
+    .button,
+    .video-trigger {
+      padding: 16px 26px;
       border-radius: 999px;
       background: linear-gradient(135deg, #ffffff, #b2ddff);
       color: #08111f;
       font-weight: 700;
-      font: inherit;
-      cursor: pointer;
       box-shadow: 0 16px 40px rgba(99, 180, 255, 0.22);
-      transition: transform 0.28s ease, box-shadow 0.28s ease;
     }
 
-    .intro-button:hover {
+    .intro-button:hover,
+    .button:hover,
+    .ghost-button:hover,
+    .music-btn:hover,
+    .video-trigger:hover {
       transform: translateY(-2px);
-      box-shadow: 0 20px 50px rgba(99, 180, 255, 0.28);
     }
 
     .site-shell {
@@ -228,40 +232,10 @@
       animation: drift 16s ease-in-out infinite;
     }
 
-    .orb.one {
-      width: 380px;
-      height: 380px;
-      background: rgba(99, 180, 255, 0.16);
-      top: 8%;
-      left: -100px;
-    }
-
-    .orb.two {
-      width: 320px;
-      height: 320px;
-      background: rgba(255, 255, 255, 0.08);
-      top: 26%;
-      right: -100px;
-      animation-delay: -5s;
-    }
-
-    .orb.three {
-      width: 430px;
-      height: 430px;
-      background: rgba(99, 180, 255, 0.10);
-      bottom: -90px;
-      left: 42%;
-      animation-delay: -9s;
-    }
-
-    .orb.four {
-      width: 220px;
-      height: 220px;
-      background: rgba(255,255,255,0.05);
-      bottom: 24%;
-      left: -60px;
-      animation-delay: -3s;
-    }
+    .orb.one { width: 380px; height: 380px; background: rgba(99,180,255,0.16); top: 8%; left: -100px; }
+    .orb.two { width: 320px; height: 320px; background: rgba(255,255,255,0.08); top: 26%; right: -100px; animation-delay: -5s; }
+    .orb.three { width: 430px; height: 430px; background: rgba(99,180,255,0.10); bottom: -90px; left: 42%; animation-delay: -9s; }
+    .orb.four { width: 220px; height: 220px; background: rgba(255,255,255,0.05); bottom: 24%; left: -60px; animation-delay: -3s; }
 
     @keyframes drift {
       0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
@@ -347,10 +321,7 @@
       transition: 0.28s ease;
     }
 
-    .nav-links a:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.08);
-    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.08); }
 
     .hero {
       min-height: 100vh;
@@ -367,7 +338,6 @@
       display: grid;
       grid-template-columns: 1.08fr 0.92fr;
       gap: clamp(24px, 4vw, 42px);
-      transform-style: preserve-3d;
       min-height: 78vh;
     }
 
@@ -422,7 +392,6 @@
       border-radius: 18px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      transform: translateZ(22px);
     }
 
     .meta-label {
@@ -433,11 +402,7 @@
       margin-bottom: 7px;
     }
 
-    .meta-value {
-      font-size: 1rem;
-      color: var(--text);
-      line-height: 1.5;
-    }
+    .meta-value { font-size: 1rem; color: var(--text); line-height: 1.5; }
 
     .hero-actions {
       display: flex;
@@ -446,38 +411,13 @@
       align-items: center;
     }
 
-    .button, .ghost-button, .music-btn, .video-trigger {
-      border: none;
-      cursor: pointer;
-      transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease, border-color 0.28s ease;
-      font: inherit;
-    }
-
-    .button, .video-trigger {
-      padding: 15px 22px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #ffffff, #b2ddff);
-      color: #08111f;
-      font-weight: 700;
-      box-shadow: 0 16px 40px rgba(99, 180, 255, 0.24);
-    }
-
-    .button:hover, .ghost-button:hover, .music-btn:hover, .video-trigger:hover {
-      transform: translateY(-2px);
-    }
-
-    .ghost-button, .music-btn {
+    .ghost-button,
+    .music-btn {
       padding: 15px 22px;
       border-radius: 999px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
       color: var(--text);
-    }
-
-    .hero-photo-wrap {
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
     }
 
     .hero-photo {
@@ -488,11 +428,10 @@
       border: 1px solid rgba(255,255,255,0.14);
       box-shadow: 0 34px 90px rgba(0,0,0,0.48);
       position: relative;
-      isolation: isolate;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)),
         url('grad_1.jpg') center/cover no-repeat;
-      transform: perspective(1200px) rotateY(-8deg) rotateX(2deg) translateZ(12px);
+      transform: perspective(1200px) rotateY(-8deg) rotateX(2deg);
     }
 
     .hero-photo::before {
@@ -559,11 +498,7 @@
       margin-bottom: 8px;
     }
 
-    .section-heading p {
-      color: var(--muted);
-      max-width: 720px;
-      line-height: 1.9;
-    }
+    .section-heading p { color: var(--muted); max-width: 720px; line-height: 1.9; }
 
     .love-note {
       border-radius: var(--radius-xl);
@@ -583,205 +518,105 @@
       pointer-events: none;
     }
 
-    .love-note p {
-      color: var(--muted);
-      line-height: 2.02;
-      font-size: 1.06rem;
-      max-width: 950px;
+    .love-note p { color: var(--muted); line-height: 2.02; font-size: 1.06rem; max-width: 950px; }
+
+    .journey-intro { margin-top: -8px; margin-bottom: 24px; color: var(--soft); line-height: 1.85; max-width: 860px; }
+
+    .story-list {
+      display: flex;
+      flex-direction: column;
+      gap: 90px;
+      margin-top: 26px;
     }
 
-    .journey-intro {
-      margin-top: -8px;
-      margin-bottom: 20px;
-      color: var(--soft);
-      line-height: 1.85;
-      max-width: 860px;
-    }
-
-    .timeline {
-      position: relative;
-      padding-left: 34px;
-      margin-top: 22px;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 10px;
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(99,180,255,0.55), rgba(255,255,255,0.03));
-      box-shadow: 0 0 18px rgba(99,180,255,0.12);
-    }
-
-    .moment {
-      position: relative;
-      padding: 0 0 32px 34px;
-    }
-
-    .moment::before {
-      content: "";
-      position: absolute;
-      left: -2px;
-      top: 8px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff 0%, var(--blue) 60%, rgba(99,180,255,0.24) 100%);
-      box-shadow: 0 0 22px rgba(99,180,255,0.7);
-    }
-
-    .moment-card {
-      border-radius: var(--radius-xl);
-      padding: clamp(24px, 3vw, 32px);
+    .story-block {
       display: grid;
-      grid-template-columns: 1.02fr 0.98fr;
-      gap: 24px;
+      grid-template-columns: 1fr 1fr;
+      gap: 52px;
       align-items: center;
-      transform-style: preserve-3d;
-      position: relative;
-      overflow: hidden;
     }
 
-    .moment-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(140deg, rgba(255,255,255,0.06), transparent 42%, rgba(99,180,255,0.08));
-      pointer-events: none;
+    .story-block.reverse { direction: rtl; }
+    .story-block.reverse .story-text { direction: ltr; }
+
+    .story-text {
+      max-width: 520px;
+      padding: 28px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.24);
     }
 
-    .moment-copy, .moment-photos { position: relative; z-index: 1; }
-
-    .moment-copy .chapter {
+    .story-text .chapter {
       display: inline-flex;
       font-size: 0.78rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--soft);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .moment-copy h3 {
+    .story-text h3 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 3vw, 3.1rem);
+      font-size: clamp(2.2rem, 3vw, 3.2rem);
       line-height: 0.95;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
-    .moment-copy .poem {
-      font-size: 1.04rem;
+    .story-text p {
+      font-size: 1.05rem;
       color: var(--muted);
-      line-height: 1.98;
-      margin-bottom: 18px;
+      line-height: 2;
     }
 
-    .moment-copy .subtext {
-      color: var(--soft);
-      line-height: 1.82;
-      font-size: 0.97rem;
-    }
-
-    .moment-photos {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .photo {
+    .story-image {
       position: relative;
+      border-radius: 26px;
       overflow: hidden;
-      border-radius: 22px;
       border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.42);
       background: rgba(255,255,255,0.04);
+      transform: perspective(1000px) rotateY(-6deg);
+      transition: transform 0.6s ease, box-shadow 0.6s ease;
+      min-height: 460px;
       cursor: pointer;
-      min-height: 220px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.28);
-      transform: perspective(1100px) rotateY(0deg) translateZ(0px);
-      transition: transform 0.5s ease, box-shadow 0.5s ease;
     }
 
-    .photo:hover {
-      transform: perspective(1100px) rotateY(5deg) translateY(-5px);
-      box-shadow: 0 24px 58px rgba(0,0,0,0.35);
-    }
+    .story-block.reverse .story-image { transform: perspective(1000px) rotateY(6deg); }
+    .story-image:hover { transform: perspective(1000px) rotateY(0deg) translateY(-4px); box-shadow: 0 36px 90px rgba(0,0,0,0.5); }
 
-    .photo.large { grid-column: span 2; min-height: 310px; }
-
-    .photo img {
+    .story-image img {
       width: 100%;
       height: 100%;
+      min-height: 460px;
       object-fit: cover;
-      transition: transform 0.78s ease, filter 0.78s ease;
-      filter: saturate(1.02) contrast(1.03) brightness(0.88);
+      transition: transform 0.8s ease, filter 0.8s ease;
+      filter: brightness(0.9) saturate(1.03);
     }
 
-    .photo::after {
+    .story-image::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, transparent 40%, rgba(5,12,22,0.42) 100%);
+      background: linear-gradient(180deg, transparent 35%, rgba(5,12,22,0.4) 100%);
       pointer-events: none;
     }
 
-    .photo:hover img {
-      transform: scale(1.07);
-      filter: saturate(1.08) contrast(1.05) brightness(1);
+    .story-image:hover img { transform: scale(1.05); filter: brightness(1) saturate(1.08); }
+
+    .story-block.reveal {
+      opacity: 0;
+      transform: translateY(56px);
+      transition: opacity 0.95s ease, transform 0.95s ease;
     }
 
-    .gallery-shell {
-      border-radius: 30px;
-      padding: 22px;
+    .story-block.reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .memory-card {
-      position: relative;
-      border-radius: 22px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05);
-      min-height: 260px;
-      cursor: pointer;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.22);
-      transition: transform 0.45s ease, box-shadow 0.45s ease;
-      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
-    }
-
-    .memory-card:hover {
-      transform: perspective(1000px) rotateX(3deg) rotateY(-4deg) translateY(-5px);
-      box-shadow: 0 28px 64px rgba(0,0,0,0.3);
-    }
-
-    .memory-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.78s ease, filter 0.78s ease;
-      filter: brightness(0.86);
-    }
-
-    .memory-card:hover img {
-      transform: scale(1.06);
-      filter: brightness(1);
-    }
-
-    .memory-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent, rgba(4, 10, 18, 0.4));
-    }
-
-    .finale {
-      padding-bottom: 124px;
-    }
+    .finale { padding-bottom: 124px; }
 
     .finale-card {
       border-radius: 36px;
@@ -803,25 +638,10 @@
       pointer-events: none;
     }
 
-    .finale-card::before {
-      background: rgba(99, 180, 255, 0.16);
-      top: -90px;
-      left: -70px;
-    }
+    .finale-card::before { background: rgba(99,180,255,0.16); top: -90px; left: -70px; }
+    .finale-card::after { background: rgba(255,255,255,0.08); right: -70px; bottom: -95px; }
 
-    .finale-card::after {
-      background: rgba(255, 255, 255, 0.08);
-      right: -70px;
-      bottom: -95px;
-    }
-
-    .finale-inner {
-      position: relative;
-      z-index: 1;
-      max-width: 940px;
-      margin: 0 auto;
-    }
-
+    .finale-inner { position: relative; z-index: 1; max-width: 940px; margin: 0 auto; }
     .finale-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(2.8rem, 6vw, 5.8rem);
@@ -829,12 +649,7 @@
       margin-bottom: 16px;
     }
 
-    .finale-text {
-      color: var(--muted);
-      line-height: 2.02;
-      font-size: 1.08rem;
-      margin-bottom: 26px;
-    }
+    .finale-text { color: var(--muted); line-height: 2.02; font-size: 1.08rem; margin-bottom: 26px; }
 
     .finale-actions {
       display: flex;
@@ -888,10 +703,7 @@
     }
 
     .lightbox.open,
-    .video-modal.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .video-modal.open { opacity: 1; pointer-events: auto; }
 
     .lightbox-inner,
     .video-modal-inner {
@@ -912,11 +724,7 @@
       background: #071221;
     }
 
-    .video-modal video {
-      width: 100%;
-      max-height: 90vh;
-      background: #000;
-    }
+    .video-modal video { width: 100%; max-height: 90vh; background: #000; }
 
     .lightbox-close,
     .video-close {
@@ -951,9 +759,11 @@
 
     @media (max-width: 1120px) {
       .hero-card,
-      .moment-card { grid-template-columns: 1fr; }
+      .story-block { grid-template-columns: 1fr; }
       .hero-photo { min-height: 520px; transform: none; }
-      .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .story-block.reverse { direction: ltr; }
+      .story-image,
+      .story-block.reverse .story-image { transform: none; }
     }
 
     @media (max-width: 760px) {
@@ -964,34 +774,31 @@
         flex-direction: column;
       }
 
-      .intro-content {
-        padding: 28px 20px;
-      }
-
+      .intro-content { padding: 28px 20px; }
       .nav-links { justify-content: flex-start; }
       .hero { padding-top: 34px; }
       .hero-card { min-height: auto; }
       .hero-meta { grid-template-columns: 1fr; }
       .hero-photo { min-height: 420px; }
-      .timeline { padding-left: 18px; }
-      .moment { padding-left: 24px; }
-      .memory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .story-list { gap: 54px; }
+      .story-block { gap: 20px; }
+      .story-text { padding: 22px; }
+      .story-image,
+      .story-image img { min-height: 340px; }
       .finale-actions { flex-direction: column; align-items: center; }
-      .button, .ghost-button, .music-btn, .video-trigger, .intro-button { width: 100%; justify-content: center; }
+      .button, .ghost-button, .music-btn, .video-trigger, .intro-button { width: 100%; }
     }
 
     @media (max-width: 520px) {
       .container { width: min(var(--content), calc(100% - 20px)); }
-      .hero-card, .love-note, .moment-card, .gallery-shell, .finale-card { border-radius: 24px; }
-      .moment-photos, .memory-grid { grid-template-columns: 1fr; }
-      .photo.large { grid-column: span 1; }
+      .hero-card, .love-note, .story-text, .story-image, .finale-card { border-radius: 24px; }
       .hero h1, .intro-content h1 { font-size: 3.1rem; }
       .finale-title { font-size: 3rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .orb, .reveal, .photo img, .memory-card img, .button, .ghost-button, .music-btn, .video-trigger, .intro-particles span, .intro-button { animation: none !important; transition: none !important; }
+      .orb, .reveal, .story-block.reveal, .story-image img, .button, .ghost-button, .music-btn, .video-trigger, .intro-particles span, .intro-button { animation: none !important; transition: none !important; }
       #scene3d { display: none; }
     }
   </style>
@@ -1005,335 +812,250 @@
     <div class="intro-content reveal visible">
       <div class="pill">A Graduation Tribute</div>
       <h1>Yashuu's Journey</h1>
-      <p>
-        A story made of warmth, laughter, love, and the memories that make her unforgettable.
-      </p>
+      <p>A story made of warmth, laughter, love, and the memories that make her unforgettable.</p>
       <button id="enterExperience" class="intro-button" type="button">Dive Into Memories</button>
     </div>
   </div>
+
   <div class="site-shell" id="siteShell">
-  <div class="progress" id="progressBar"></div>
+    <div class="progress" id="progressBar"></div>
 
-  <div class="ambient" aria-hidden="true">
-    <div class="orb one"></div>
-    <div class="orb two"></div>
-    <div class="orb three"></div>
-    <div class="orb four"></div>
-  </div>
-
-  <nav class="site-nav reveal glass">
-    <div class="brand">Yashuu's Journey ✨</div>
-    <div class="nav-links">
-      <a href="#letter">Letter</a>
-      <a href="#journey">Journey</a>
-      <a href="#gallery">Gallery</a>
-      <a href="#finale">Finale</a>
+    <div class="ambient" aria-hidden="true">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+      <div class="orb four"></div>
     </div>
-  </nav>
 
-  <canvas id="scene3d" aria-hidden="true"></canvas>
+    <nav class="site-nav reveal glass">
+      <div class="brand">Yashuu's Journey ✨</div>
+      <div class="nav-links">
+        <a href="#letter">Letter</a>
+        <a href="#journey">Journey</a>
+        <a href="#finale">Finale</a>
+      </div>
+    </nav>
 
-  <main>
-    <section class="hero">
-      <div class="container">
-        <div class="hero-card glass reveal">
-          <div class="hero-copy">
-            <div class="eyebrow pill">Graduation Tribute • UTA Arlington • Class of 2026</div>
-            <h1>
-              Sai Shrivalli<br />
-              Satya <span>Yasaswini</span>
-            </h1>
-            <p class="hero-subtitle">
-              For the girl who carried kindness, strength, grace, and warmth in everything she did. This is not just a graduation website. It is a small world built to honor her journey, her bright smile, her quiet courage, and the beautiful future waiting for her.
+    <canvas id="scene3d" aria-hidden="true"></canvas>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-card glass reveal">
+            <div class="hero-copy">
+              <div class="eyebrow pill">Graduation Tribute • UTA Arlington • Class of 2026</div>
+              <h1>Sai Shrivalli<br />Satya <span>Yasaswini</span></h1>
+              <p class="hero-subtitle">
+                For the girl who carried kindness, strength, grace, and warmth in everything she did.
+                This is a small world built to honor her journey, her bright smile, her quiet courage,
+                and the beautiful future waiting for her.
+              </p>
+
+              <div class="hero-meta">
+                <div class="meta-card">
+                  <div class="meta-label">School</div>
+                  <div class="meta-value">UTA Arlington</div>
+                </div>
+                <div class="meta-card">
+                  <div class="meta-label">Degree</div>
+                  <div class="meta-value">B.S. in Business Analytics</div>
+                </div>
+                <div class="meta-card">
+                  <div class="meta-label">Year</div>
+                  <div class="meta-value">2026</div>
+                </div>
+              </div>
+
+              <div class="hero-actions">
+                <a class="button" href="#journey">See Her Journey</a>
+                <a class="ghost-button" href="#finale">Final Message</a>
+                <button class="music-btn" id="musicToggle" type="button">Pause Music ♫</button>
+              </div>
+
+              <div class="hero-quote">
+                She is the kind of person who makes a place feel complete just by being there.
+                Gentle, unforgettable, and loved in a way words can barely hold.
+              </div>
+            </div>
+
+            <div class="hero-photo-wrap">
+              <div class="hero-photo reveal">
+                <div class="hero-photo-caption">
+                  <strong>Yashuu • Sattuu • Maverick in the making</strong>
+                  <span>A heart full of warmth, a mind full of dreams, and a future that already shines.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="letter">
+        <div class="container">
+          <div class="section-heading reveal">
+            <div>
+              <div class="pill">A Note For Yashuu</div>
+              <h2>Some people leave a mark.<br />She leaves warmth.</h2>
+            </div>
+            <p>
+              This chapter is not only about achievement. It is about the kind of person she has always been,
+              and the way her presence quietly turns ordinary moments into something brighter.
             </p>
-
-            <div class="hero-meta">
-              <div class="meta-card">
-                <div class="meta-label">School</div>
-                <div class="meta-value">UTA Arlington</div>
-              </div>
-              <div class="meta-card">
-                <div class="meta-label">Degree</div>
-                <div class="meta-value">B.S. in Business Analytics</div>
-              </div>
-              <div class="meta-card">
-                <div class="meta-label">Year</div>
-                <div class="meta-value">2026</div>
-              </div>
-            </div>
-
-            <div class="hero-actions">
-              <a class="button" href="#journey">See Her Journey</a>
-              <a class="ghost-button" href="#finale">Final Message</a>
-              <button class="music-btn" id="musicToggle" type="button">Play Music ♫</button>
-            </div>
-
-            <div class="hero-quote">
-              She is the kind of person who makes a place feel complete just by being there.
-              Gentle, unforgettable, and loved in a way words can barely hold.
-            </div>
           </div>
 
-          <div class="hero-photo-wrap">
-            <div class="hero-photo reveal">
-              <div class="hero-photo-caption">
-                <strong>Yashuu • Sattuu • Maverick in the making</strong>
-                <span>A heart full of love, a mind full of dreams, and a future that already shines.</span>
-              </div>
-            </div>
+          <div class="love-note glass reveal">
+            <p>
+              Yashuu, you are one of the most wonderful people we have ever known. Kind in a way that feels rare,
+              thoughtful in a way that stays with people, and warm in a way that makes everyone around you feel seen.
+              You have a softness that comforts, a strength that inspires, and a presence that fills every space with light.
+              <br /><br />
+              Some people are remembered for what they achieve. You are remembered for how deeply you are felt.
+              In your laughter, there is joy. In your care, there is peace. In your absence, there is a quiet feeling
+              that something important is missing. It feels incomplete when you are not around.
+              <br /><br />
+              And that is why this moment means so much. Because this graduation is not only a celebration of your success,
+              but of the beautiful person you are. We are proud of you, grateful for you, and so lucky to know you.
+              We love you.
+            </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="letter">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div>
-            <div class="pill">A Note For Yashuu</div>
-            <h2>Some people leave a mark.<br />She leaves warmth.</h2>
+      <section id="journey">
+        <div class="container">
+          <div class="section-heading reveal">
+            <div>
+              <div class="pill">Her Story</div>
+              <h2>The journey that shaped her.</h2>
+            </div>
+            <p>
+              Some lives are remembered in achievements. Hers is remembered in feelings.
+              In warmth, in laughter, in the softness she leaves behind, and in how deeply she is missed when she is away.
+            </p>
           </div>
-          <p>
-            This chapter is not only about achievement. It is about the kind of person she has always been,
-            and the way her presence quietly turns ordinary moments into something brighter.
+
+          <p class="journey-intro reveal">
+            These moments are not just memories. They are little pieces of the person everyone came to admire,
+            appreciate, and love. A story made of joy, strength, kindness, and the beautiful way she made life brighter.
           </p>
-        </div>
 
-        <div class="love-note glass reveal">
-          <p>
-            Yashuu, you are one of the most wonderful people we have ever known. Kind in a way that feels rare,
-            thoughtful in a way that stays with people, and warm in a way that makes everyone around you feel seen.
-            You have a softness that comforts, a strength that inspires, and a presence that fills every space with light.
-            <br /><br />
-            Some people are remembered for what they achieve. You are remembered for how deeply you are felt.
-            In your laughter, there is joy. In your care, there is peace. In your absence, there is a quiet feeling
-            that something important is missing. It feels incomplete when you are not around.
-            <br /><br />
-            And that is why this moment means so much. Because this graduation is not only a celebration of your success,
-            but of the beautiful person you are. We are proud of you, grateful for you, and so lucky to know you.
-            We love you.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section id="journey">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div>
-            <div class="pill">Her Story</div>
-            <h2>The journey that shaped her.</h2>
-          </div>
-          <p>
-            Some lives are remembered in achievements. Hers is remembered in feelings.
-            In warmth, in laughter, in the softness she leaves behind, and in how deeply she is missed when she is away.
-          </p>
-        </div>
-
-        <p class="journey-intro reveal">
-          These moments are not just memories. They are little pieces of the person everyone came to admire,
-          appreciate, and love. A story made of joy, strength, kindness, and the beautiful way she made life brighter.
-        </p>
-
-        <div class="timeline">
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter One</span>
+          <div class="story-list">
+            <div class="story-block reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 1</div>
                 <h3>Tiny feet, endless wonder.</h3>
-                <p class="poem">
+                <p>
                   She began as a little light with curious eyes and a heart already full of life.
                   Even in the earliest moments, there was something unforgettable about her,
                   a softness, a spark, a sweetness that made every memory around her feel warmer.
                 </p>
-                <p class="subtext">
-                  The beginning of a story that would one day grow into grace, strength, warmth, and something truly unforgettable.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo large"><img src="ch1_pic1.jpg" alt="Yashuu childhood memory 1" /></div>
-                <div class="photo"><img src="ch1_pic2.jpg" alt="Yashuu childhood memory 2" /></div>
-                <div class="photo"><img src="ch1_pic3.jpg" alt="Yashuu childhood memory 3" /></div>
-              </div>
+              <div class="story-image"><img src="ch1_pic1.jpg" alt="Early childhood memory" /></div>
             </div>
-          </article>
 
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter Two</span>
+            <div class="story-block reverse reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 2</div>
                 <h3>Pigtails, laughter, and light.</h3>
-                <p class="poem">
+                <p>
                   Childhood looked beautiful on her. There was joy in every smile, magic in every little moment,
                   and a kind of innocence that made even the simplest days feel bright. She did not just live those years.
                   She made them glow.
                 </p>
-                <p class="subtext">
-                  The years of soft memories, bright laughter, and the sweetness that still lives in her smile today.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo"><img src="ch2_pic1.jpg" alt="Yashuu memory 1" /></div>
-                <div class="photo"><img src="ch2_pic2.jpg" alt="Yashuu memory 2" /></div>
-                <div class="photo large"><img src="ch2_pic3.jpg" alt="Yashuu memory 3" /></div>
-              </div>
+              <div class="story-image"><img src="ch2_pic1.jpg" alt="Childhood memory" /></div>
             </div>
-          </article>
 
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter Three</span>
+            <div class="story-block reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 3</div>
                 <h3>Fire in her spirit, gold in her heart.</h3>
-                <p class="poem">
+                <p>
                   As she grew, so did her light. There was courage in the way she carried herself,
                   strength in the way she faced change, and beauty in the way she stayed true to who she was.
                   She was learning how to become, and somehow she made becoming look graceful.
                 </p>
-                <p class="subtext">
-                  A season of becoming, of discovering her voice, and of growing stronger without losing her softness.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo large"><img src="ch3_pic1.jpg" alt="Teenage Yashuu 1" /></div>
-                <div class="photo"><img src="ch3_pic2.jpg" alt="Teenage Yashuu 2" /></div>
-                <div class="photo"><img src="ch3_pic3.jpg" alt="Teenage Yashuu 3" /></div>
-              </div>
+              <div class="story-image"><img src="ch3_pic1.jpg" alt="Teen years memory" /></div>
             </div>
-          </article>
 
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter Four</span>
+            <div class="story-block reverse reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 4</div>
                 <h3>Dreams learned how to fly.</h3>
-                <p class="poem">
+                <p>
                   This was the chapter where hope became direction. The dreams in her heart slowly found shape,
                   and the future stopped feeling far away. Step by step, she kept moving forward with quiet determination,
                   carrying elegance even through the hard parts.
                 </p>
-                <p class="subtext">
-                  The season where ambition found its path, and her future started becoming something real.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo"><img src="ch4_pic1.jpg" alt="Yashuu future 1" /></div>
-                <div class="photo large"><img src="ch4_pic2.jpg" alt="Yashuu future 2" /></div>
-                <div class="photo"><img src="ch4_pic3.jpg" alt="Yashuu future 3" /></div>
-              </div>
+              <div class="story-image"><img src="ch4_pic2.jpg" alt="Dreams and growth memory" /></div>
             </div>
-          </article>
 
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter Five</span>
+            <div class="story-block reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 5</div>
                 <h3>The people, the laughter, the love.</h3>
-                <p class="poem">
+                <p>
                   Every beautiful journey is made softer by the people who walk beside it.
                   Somewhere between shared laughter, long talks, comfort, and unforgettable memories,
                   she built a world full of warmth. And in that world, her presence became one of the brightest parts.
                 </p>
-                <p class="subtext">
-                  A reminder that her light does not stay with just one person. It reaches everyone around her.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo"><img src="friends_1.jpg" alt="Friends memory 1" /></div>
-                <div class="photo"><img src="friends_2.jpg" alt="Friends memory 2" /></div>
-                <div class="photo large"><img src="friends_3.jpg" alt="Friends memory 3" /></div>
-              </div>
+              <div class="story-image"><img src="friends_3.jpg" alt="Friends memory" /></div>
             </div>
-          </article>
 
-          <article class="moment reveal">
-            <div class="moment-card glass">
-              <div class="moment-copy">
-                <span class="chapter">Chapter Six</span>
+            <div class="story-block reverse reveal">
+              <div class="story-text">
+                <div class="chapter">Chapter 6</div>
                 <h3>The Maverick she became.</h3>
-                <p class="poem">
+                <p>
                   And now she stands here, at the edge of a beautiful new beginning.
                   Not only as a student who earned a degree, but as someone who gave her all,
                   stayed strong through the hard days, and arrived here with grace still intact.
                   This moment belongs to her in every way.
                 </p>
-                <p class="subtext">
-                  Bachelor of Science in Business Analytics • UTA Arlington • Class of 2026.
-                </p>
               </div>
-              <div class="moment-photos">
-                <div class="photo large"><img src="grad_1.jpg" alt="Graduation photo 1" /></div>
-                <div class="photo"><img src="grad_2.jpg" alt="Graduation photo 2" /></div>
-                <div class="photo"><img src="grad_3.jpg" alt="Graduation photo 3" /></div>
-              </div>
+              <div class="story-image"><img src="grad_2.jpg" alt="Graduation memory" /></div>
             </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="gallery">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div>
-            <div class="pill">Memory Gallery</div>
-            <h2>Pieces of her, everywhere.</h2>
-          </div>
-          <p>
-            A few more frames for the moments that deserve to be looked at twice.
-            Tap or click any photo to open it in full view.
-          </p>
-        </div>
-
-        <div class="gallery-shell glass reveal">
-          <div class="memory-grid">
-          <div class="memory-card"><img src="ch1_pic4.jpg" alt="Gallery image 1" /></div>
-          <div class="memory-card"><img src="ch1_pic5.jpg" alt="Gallery image 2" /></div>
-          <div class="memory-card"><img src="ch1_pic6.jpg" alt="Gallery image 3" /></div>
-          <div class="memory-card"><img src="friends_4.jpg" alt="Gallery image 4" /></div>
-          <div class="memory-card"><img src="friends_5.jpg" alt="Gallery image 5" /></div>
-          <div class="memory-card"><img src="friends_6.jpg" alt="Gallery image 6" /></div>
-          <div class="memory-card"><img src="friends_7.jpg" alt="Gallery image 7" /></div>
-          <div class="memory-card"><img src="friends_8.jpg" alt="Gallery image 8" /></div>
-        </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="finale" id="finale">
-      <div class="container">
-        <div class="finale-card glass reveal">
-          <div class="finale-inner">
-            <div class="pill" style="margin-bottom: 18px;">Final Message</div>
-            <h2 class="finale-title">Happy Graduation, Yashuu.</h2>
-            <p class="finale-text">
-              You did it.<br />
-              After all the effort, the long days, the pressure, and the moments that asked so much from you,
-              you still kept going. And now this moment is finally yours.
-              <br /><br />
-              You are graduating with a Bachelor of Science in Business Analytics from UTA Arlington in 2026,
-              and that alone is something beautiful. But what makes this day even more special is the person behind it.
-              The kindness you carry. The warmth you give. The way you make people feel safe, happy, and deeply cared for.
-              <br /><br />
-              You are the kind of person whose presence changes the feeling of a place.
-              When you are there, things feel lighter. When you are away, it feels like something is missing.
-              That is how deeply you are loved.
-              <br /><br />
-              This page holds memories. The next moment holds voices.
-              The people who know you, cherish you, and carry beautiful memories with you are waiting in one final surprise.
-            </p>
-            <div class="finale-actions">
-              <button class="video-trigger" id="openVideo" type="button">Open Final Message</button>
-              <a class="ghost-button" href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">Back to the Beginning</a>
-            </div>
-            <div class="signature">For someone truly unforgettable.</div>
-            <div class="footer-note">For Sai Shrivalli Satya Yasaswini • Yashuu • Sattuu • UTA Arlington 2026</div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
-</div>
+      </section>
+
+      <section class="finale" id="finale">
+        <div class="container">
+          <div class="finale-card glass reveal">
+            <div class="finale-inner">
+              <div class="pill" style="margin-bottom: 18px;">Final Message</div>
+              <h2 class="finale-title">Happy Graduation, Yashuu.</h2>
+              <p class="finale-text">
+                You did it.<br />
+                After all the effort, the long days, the pressure, and the moments that asked so much from you,
+                you still kept going. And now this moment is finally yours.
+                <br /><br />
+                You are graduating with a Bachelor of Science in Business Analytics from UTA Arlington in 2026,
+                and that alone is something beautiful. But what makes this day even more special is the person behind it.
+                The kindness you carry. The warmth you give. The way you make people feel safe, happy, and deeply cared for.
+                <br /><br />
+                You are the kind of person whose presence changes the feeling of a place.
+                When you are there, things feel lighter. When you are away, it feels like something is missing.
+                That is how deeply you are loved.
+                <br /><br />
+                This page holds memories. The next moment holds voices.
+                The people who know you, cherish you, and carry beautiful memories with you are waiting in one final surprise.
+              </p>
+              <div class="finale-actions">
+                <button class="video-trigger" id="openVideo" type="button">Open Final Message</button>
+                <a class="ghost-button" href="#top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">Back to the Beginning</a>
+              </div>
+              <div class="signature">For someone truly unforgettable.</div>
+              <div class="footer-note">For Sai Shrivalli Satya Yasaswini • Yashuu • Sattuu • UTA Arlington 2026</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lightbox-inner">
@@ -1364,7 +1086,7 @@
     const music = document.getElementById('bgm');
     const musicToggle = document.getElementById('musicToggle');
     const revealEls = document.querySelectorAll('.reveal');
-    const photos = document.querySelectorAll('.photo img, .memory-card img');
+    const photos = document.querySelectorAll('.story-image img');
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxClose = document.getElementById('lightboxClose');
@@ -1423,14 +1145,13 @@
       introGate.classList.add('hidden');
       document.body.style.overflowY = 'auto';
       burstHearts();
-      setTimeout(() => {
-        introGate.remove();
-      }, 1200);
+      setTimeout(() => introGate.remove(), 1200);
     }
 
     enterExperience.addEventListener('click', async () => {
       await playMusicFromIntro();
       startExperienceReveal();
+      resumeSceneAnimation();
     });
 
     const observer = new IntersectionObserver((entries) => {
@@ -1572,9 +1293,7 @@
       if (!scenePaused && animationFrameId) return;
       scenePaused = false;
       lastFrameTime = 0;
-      if (!animationFrameId) {
-        animationFrameId = requestAnimationFrame(draw3DScene);
-      }
+      if (!animationFrameId) animationFrameId = requestAnimationFrame(draw3DScene);
     }
 
     function draw3DScene(timestamp) {
@@ -1665,10 +1384,6 @@
     });
 
     document.body.style.overflowY = 'hidden';
-
-    enterExperience.addEventListener('click', () => {
-      resumeSceneAnimation();
-    }, { once: true });
   </script>
 </body>
 </html>

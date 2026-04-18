@@ -1239,13 +1239,13 @@
     window.addEventListener('scroll', updateProgress, { passive: true });
     updateProgress();
 
-    musicToggle.addEventListener('click', async () => {
+    async function toggleMusic(forcePlay = false) {
       try {
-        if (!musicPlaying) {
+        if (!musicPlaying || forcePlay) {
           await music.play();
           musicPlaying = true;
           musicToggle.textContent = 'Pause Music ♫';
-          burstHearts();
+          if (!forcePlay) burstHearts();
         } else {
           music.pause();
           musicPlaying = false;
@@ -1254,7 +1254,26 @@
       } catch (error) {
         console.error('Audio playback failed:', error);
       }
-    });
+    }
+
+    musicToggle.addEventListener('click', () => toggleMusic(false));
+
+    function autoStartMusicOnce() {
+      const starter = async () => {
+        if (!musicPlaying) {
+          await toggleMusic(true);
+        }
+        window.removeEventListener('pointerdown', starter);
+        window.removeEventListener('keydown', starter);
+        window.removeEventListener('touchstart', starter);
+      };
+
+      window.addEventListener('pointerdown', starter, { once: true, passive: true });
+      window.addEventListener('keydown', starter, { once: true });
+      window.addEventListener('touchstart', starter, { once: true, passive: true });
+    }
+
+    autoStartMusicOnce();
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -1287,6 +1306,7 @@
       videoModal.classList.add('open');
       videoModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      pauseSceneAnimation();
 
       if (!music.paused) {
         music.pause();
@@ -1304,6 +1324,7 @@
       videoModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
       memoryVideo.pause();
+      resumeSceneAnimation();
     }
 
     openVideo.addEventListener('click', openVideoModal);
@@ -1339,111 +1360,152 @@
     }
 
     // Lightweight 3D background canvas
-    const ctx = sceneCanvas.getContext('2d');
-    let w = sceneCanvas.width = window.innerWidth;
-    let h = sceneCanvas.height = window.innerHeight;
+    const ctx = sceneCanvas.getContext('2d', { alpha: true });
+    let w = sceneCanvas.width = Math.min(window.innerWidth, 1600);
+    let h = sceneCanvas.height = Math.min(window.innerHeight, 1200);
     let mouseX = w / 2;
     let mouseY = h / 2;
+    let animationFrameId = null;
+    let scenePaused = false;
+    let lastFrameTime = 0;
+    const targetFrameInterval = 1000 / 60;
+    const deviceQuality = window.innerWidth < 700 ? 'mobile' : window.innerWidth < 1100 ? 'medium' : 'high';
 
-    const stars = Array.from({ length: window.innerWidth < 700 ? 65 : 120 }, () => ({
+    const stars = Array.from({ length: deviceQuality === 'mobile' ? 38 : deviceQuality === 'medium' ? 68 : 92 }, () => ({
       x: (Math.random() - 0.5) * w,
       y: (Math.random() - 0.5) * h,
       z: Math.random() * 1800 + 200,
-      size: Math.random() * 2 + 0.5,
-      glow: Math.random() * 0.4 + 0.3
+      size: Math.random() * 1.6 + 0.4,
+      glow: Math.random() * 0.35 + 0.25
     }));
 
     const rings = [
-      { radius: 145, speed: 0.0018, angle: 0 },
-      { radius: 228, speed: -0.00115, angle: 1.7 },
-      { radius: 315, speed: 0.00085, angle: 0.85 }
+      { radius: 145, speed: 0.0015, angle: 0 },
+      { radius: 228, speed: -0.001, angle: 1.7 },
+      { radius: 315, speed: 0.0007, angle: 0.85 }
     ];
 
     function resizeCanvas() {
-      w = sceneCanvas.width = window.innerWidth;
-      h = sceneCanvas.height = window.innerHeight;
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const cssWidth = window.innerWidth;
+      const cssHeight = window.innerHeight;
+      sceneCanvas.style.width = cssWidth + 'px';
+      sceneCanvas.style.height = cssHeight + 'px';
+      sceneCanvas.width = Math.floor(cssWidth * ratio);
+      sceneCanvas.height = Math.floor(cssHeight * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      w = cssWidth;
+      h = cssHeight;
     }
 
+    resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
     }, { passive: true });
 
-    function draw3DScene() {
-      ctx.clearRect(0, 0, w, h);
-      const centerX = w / 2 + (mouseX - w / 2) * 0.018;
-      const centerY = h / 2 + (mouseY - h / 2) * 0.018 - window.scrollY * 0.035;
+    function pauseSceneAnimation() {
+      scenePaused = true;
+    }
 
-      // star field
-      stars.forEach((star) => {
-        star.z -= 2.4;
+    function resumeSceneAnimation() {
+      if (!scenePaused) return;
+      scenePaused = false;
+      lastFrameTime = 0;
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(draw3DScene);
+      }
+    }
+
+    function draw3DScene(timestamp) {
+      if (scenePaused) {
+        animationFrameId = null;
+        return;
+      }
+
+      if (lastFrameTime && timestamp - lastFrameTime < targetFrameInterval) {
+        animationFrameId = requestAnimationFrame(draw3DScene);
+        return;
+      }
+      lastFrameTime = timestamp;
+
+      ctx.clearRect(0, 0, w, h);
+      const centerX = w / 2 + (mouseX - w / 2) * 0.012;
+      const centerY = h / 2 + (mouseY - h / 2) * 0.012 - window.scrollY * 0.02;
+
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
+        star.z -= deviceQuality === 'mobile' ? 1.4 : 2;
         if (star.z <= 1) {
           star.z = 1900;
           star.x = (Math.random() - 0.5) * w;
           star.y = (Math.random() - 0.5) * h;
         }
 
-        const scale = 360 / star.z;
+        const scale = 320 / star.z;
         const x = centerX + star.x * scale;
         const y = centerY + star.y * scale;
-        const radius = Math.max(0.18, star.size * scale * 2.5);
+        const radius = Math.max(0.12, star.size * scale * 2.1);
 
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(170, 220, 255, ${0.45 + star.glow})`;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(99,180,255,0.25)';
+        ctx.fillStyle = `rgba(170, 220, 255, ${0.34 + star.glow})`;
         ctx.fill();
-      });
+      }
 
-      // soft rings
-      rings.forEach((ring, idx) => {
-        ring.angle += ring.speed * 16;
-        const rx = ring.radius + Math.sin(ring.angle * 1.5) * 18;
-        const ry = ring.radius * 0.33;
-        ctx.save();
-        ctx.translate(centerX, centerY + idx * 18);
-        ctx.rotate(ring.angle + window.scrollY * 0.0005 * (idx + 1));
-        ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = idx === 1 ? 'rgba(255,255,255,0.12)' : 'rgba(99,180,255,0.17)';
-        ctx.lineWidth = idx === 1 ? 1.2 : 1.9;
-        ctx.shadowBlur = 24;
-        ctx.shadowColor = 'rgba(99,180,255,0.25)';
-        ctx.stroke();
-        ctx.restore();
-      });
+      if (deviceQuality !== 'mobile') {
+        for (let i = 0; i < rings.length; i++) {
+          const ring = rings[i];
+          ring.angle += ring.speed * 16;
+          const rx = ring.radius + Math.sin(ring.angle * 1.3) * 12;
+          const ry = ring.radius * 0.31;
+          ctx.save();
+          ctx.translate(centerX, centerY + i * 14);
+          ctx.rotate(ring.angle + window.scrollY * 0.0003 * (i + 1));
+          ctx.beginPath();
+          ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = i === 1 ? 'rgba(255,255,255,0.08)' : 'rgba(99,180,255,0.12)';
+          ctx.lineWidth = 1.1;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
 
-      // center crystal
-      const pulse = 1 + Math.sin(Date.now() * 0.0015) * 0.05;
+      const pulse = 1 + Math.sin(timestamp * 0.0014) * 0.04;
       ctx.save();
       ctx.translate(centerX, centerY);
-      ctx.rotate(Date.now() * 0.00022);
+      ctx.rotate(timestamp * 0.00018);
       ctx.scale(pulse, pulse);
       ctx.beginPath();
-      ctx.moveTo(0, -82);
-      ctx.lineTo(62, 0);
-      ctx.lineTo(0, 82);
-      ctx.lineTo(-62, 0);
+      ctx.moveTo(0, -72);
+      ctx.lineTo(54, 0);
+      ctx.lineTo(0, 72);
+      ctx.lineTo(-54, 0);
       ctx.closePath();
-      const grad = ctx.createLinearGradient(-64, -64, 64, 64);
-      grad.addColorStop(0, 'rgba(255,255,255,0.2)');
-      grad.addColorStop(0.5, 'rgba(99,180,255,0.2)');
-      grad.addColorStop(1, 'rgba(255,255,255,0.08)');
+      const grad = ctx.createLinearGradient(-56, -56, 56, 56);
+      grad.addColorStop(0, 'rgba(255,255,255,0.16)');
+      grad.addColorStop(0.5, 'rgba(99,180,255,0.16)');
+      grad.addColorStop(1, 'rgba(255,255,255,0.06)');
       ctx.fillStyle = grad;
-      ctx.strokeStyle = 'rgba(210,236,255,0.45)';
-      ctx.lineWidth = 1.4;
-      ctx.shadowBlur = 34;
-      ctx.shadowColor = 'rgba(99,180,255,0.28)';
+      ctx.strokeStyle = 'rgba(210,236,255,0.28)';
+      ctx.lineWidth = 1;
       ctx.fill();
       ctx.stroke();
       ctx.restore();
 
-      requestAnimationFrame(draw3DScene);
+      animationFrameId = requestAnimationFrame(draw3DScene);
     }
 
-    draw3DScene();
+    animationFrameId = requestAnimationFrame(draw3DScene);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pauseSceneAnimation();
+      } else {
+        resumeSceneAnimation();
+      }
+    });
   </script>
 </body>
 </html>

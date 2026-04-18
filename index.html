@@ -74,6 +74,133 @@
     a { color: inherit; text-decoration: none; }
     img, video { display: block; width: 100%; }
 
+    .intro-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(99,180,255,0.16), transparent 24%),
+        linear-gradient(180deg, rgba(1,2,8,0.94), rgba(2,4,10,0.98));
+      transition: opacity 1s ease, visibility 1s ease, transform 1s ease;
+    }
+
+    .intro-gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: scale(1.02);
+    }
+
+    .intro-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.08), transparent 16%),
+        radial-gradient(circle at 72% 20%, rgba(99,180,255,0.12), transparent 18%),
+        radial-gradient(circle at 50% 82%, rgba(99,180,255,0.08), transparent 24%);
+      filter: blur(8px);
+      transform: scale(1.08);
+    }
+
+    .intro-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .intro-particles span {
+      position: absolute;
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(185, 225, 255, 0.75);
+      box-shadow: 0 0 16px rgba(99,180,255,0.35);
+      animation: introFloat 8s linear infinite;
+      opacity: 0.65;
+    }
+
+    .intro-particles span:nth-child(1) { left: 12%; top: 70%; animation-delay: 0s; }
+    .intro-particles span:nth-child(2) { left: 24%; top: 52%; animation-delay: 1.2s; }
+    .intro-particles span:nth-child(3) { left: 44%; top: 76%; animation-delay: 2.6s; }
+    .intro-particles span:nth-child(4) { left: 67%; top: 34%; animation-delay: 0.8s; }
+    .intro-particles span:nth-child(5) { left: 80%; top: 64%; animation-delay: 2s; }
+    .intro-particles span:nth-child(6) { left: 56%; top: 22%; animation-delay: 3.4s; }
+
+    @keyframes introFloat {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      15% { opacity: 0.75; }
+      100% { transform: translateY(-130px) scale(1.25); opacity: 0; }
+    }
+
+    .intro-content {
+      position: relative;
+      z-index: 1;
+      width: min(760px, calc(100% - 32px));
+      text-align: center;
+      padding: 36px;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.45);
+    }
+
+    .intro-content .pill {
+      margin-bottom: 18px;
+    }
+
+    .intro-content h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 8vw, 6.4rem);
+      line-height: 0.92;
+      margin-bottom: 14px;
+      text-shadow: 0 0 34px rgba(99,180,255,0.14);
+    }
+
+    .intro-content p {
+      max-width: 620px;
+      margin: 0 auto 24px;
+      color: var(--muted);
+      line-height: 1.95;
+      font-size: 1.04rem;
+    }
+
+    .intro-button {
+      padding: 16px 26px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffffff, #b2ddff);
+      color: #08111f;
+      font-weight: 700;
+      font: inherit;
+      cursor: pointer;
+      box-shadow: 0 16px 40px rgba(99, 180, 255, 0.22);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+
+    .intro-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 50px rgba(99, 180, 255, 0.28);
+    }
+
+    .site-shell {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+
+    .site-shell.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
     .progress {
       position: fixed;
       top: 0;
@@ -837,6 +964,10 @@
         flex-direction: column;
       }
 
+      .intro-content {
+        padding: 28px 20px;
+      }
+
       .nav-links { justify-content: flex-start; }
       .hero { padding-top: 34px; }
       .hero-card { min-height: auto; }
@@ -846,7 +977,7 @@
       .moment { padding-left: 24px; }
       .memory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .finale-actions { flex-direction: column; align-items: center; }
-      .button, .ghost-button, .music-btn, .video-trigger { width: 100%; justify-content: center; }
+      .button, .ghost-button, .music-btn, .video-trigger, .intro-button { width: 100%; justify-content: center; }
     }
 
     @media (max-width: 520px) {
@@ -854,18 +985,33 @@
       .hero-card, .love-note, .moment-card, .gallery-shell, .finale-card { border-radius: 24px; }
       .moment-photos, .memory-grid { grid-template-columns: 1fr; }
       .photo.large { grid-column: span 1; }
-      .hero h1 { font-size: 3.1rem; }
+      .hero h1, .intro-content h1 { font-size: 3.1rem; }
       .finale-title { font-size: 3rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .orb, .reveal, .photo img, .memory-card img, .button, .ghost-button, .music-btn, .video-trigger { animation: none !important; transition: none !important; }
+      .orb, .reveal, .photo img, .memory-card img, .button, .ghost-button, .music-btn, .video-trigger, .intro-particles span, .intro-button { animation: none !important; transition: none !important; }
       #scene3d { display: none; }
     }
   </style>
 </head>
 <body>
+  <div id="introGate" class="intro-gate">
+    <div class="intro-bg"></div>
+    <div class="intro-particles" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="intro-content reveal visible">
+      <div class="pill">A Graduation Tribute</div>
+      <h1>Yashuu's Journey</h1>
+      <p>
+        A story made of warmth, laughter, love, and the memories that make her unforgettable.
+      </p>
+      <button id="enterExperience" class="intro-button" type="button">Dive Into Memories</button>
+    </div>
+  </div>
+  <div class="site-shell" id="siteShell">
   <div class="progress" id="progressBar"></div>
 
   <div class="ambient" aria-hidden="true">
@@ -873,9 +1019,6 @@
     <div class="orb two"></div>
     <div class="orb three"></div>
     <div class="orb four"></div>
-  </div>
-    <div class="orb two"></div>
-    <div class="orb three"></div>
   </div>
 
   <nav class="site-nav reveal glass">
@@ -1190,6 +1333,7 @@
       </div>
     </section>
   </main>
+</div>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lightbox-inner">
@@ -1213,6 +1357,9 @@
   </audio>
 
   <script>
+    const introGate = document.getElementById('introGate');
+    const enterExperience = document.getElementById('enterExperience');
+    const siteShell = document.getElementById('siteShell');
     const progressBar = document.getElementById('progressBar');
     const music = document.getElementById('bgm');
     const musicToggle = document.getElementById('musicToggle');
@@ -1228,6 +1375,7 @@
     const memoryVideo = document.getElementById('memoryVideo');
 
     let musicPlaying = false;
+    let experienceStarted = false;
 
     function updateProgress() {
       const scrollTop = window.scrollY;
@@ -1239,13 +1387,23 @@
     window.addEventListener('scroll', updateProgress, { passive: true });
     updateProgress();
 
-    async function toggleMusic(forcePlay = false) {
+    async function playMusicFromIntro() {
       try {
-        if (!musicPlaying || forcePlay) {
+        await music.play();
+        musicPlaying = true;
+        musicToggle.textContent = 'Pause Music ♫';
+      } catch (error) {
+        console.error('Audio playback failed:', error);
+      }
+    }
+
+    async function toggleMusic() {
+      try {
+        if (!musicPlaying) {
           await music.play();
           musicPlaying = true;
           musicToggle.textContent = 'Pause Music ♫';
-          if (!forcePlay) burstHearts();
+          burstHearts();
         } else {
           music.pause();
           musicPlaying = false;
@@ -1256,24 +1414,24 @@
       }
     }
 
-    musicToggle.addEventListener('click', () => toggleMusic(false));
+    musicToggle.addEventListener('click', toggleMusic);
 
-    function autoStartMusicOnce() {
-      const starter = async () => {
-        if (!musicPlaying) {
-          await toggleMusic(true);
-        }
-        window.removeEventListener('pointerdown', starter);
-        window.removeEventListener('keydown', starter);
-        window.removeEventListener('touchstart', starter);
-      };
-
-      window.addEventListener('pointerdown', starter, { once: true, passive: true });
-      window.addEventListener('keydown', starter, { once: true });
-      window.addEventListener('touchstart', starter, { once: true, passive: true });
+    function startExperienceReveal() {
+      if (experienceStarted) return;
+      experienceStarted = true;
+      siteShell.classList.add('active');
+      introGate.classList.add('hidden');
+      document.body.style.overflowY = 'auto';
+      burstHearts();
+      setTimeout(() => {
+        introGate.remove();
+      }, 1200);
     }
 
-    autoStartMusicOnce();
+    enterExperience.addEventListener('click', async () => {
+      await playMusicFromIntro();
+      startExperienceReveal();
+    });
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -1284,7 +1442,9 @@
       });
     }, { threshold: 0.14 });
 
-    revealEls.forEach((el) => observer.observe(el));
+    revealEls.forEach((el) => {
+      if (!el.closest('.intro-gate')) observer.observe(el);
+    });
 
     photos.forEach((img) => {
       img.addEventListener('click', () => {
@@ -1359,14 +1519,13 @@
       }
     }
 
-    // Lightweight 3D background canvas
     const ctx = sceneCanvas.getContext('2d', { alpha: true });
     let w = sceneCanvas.width = Math.min(window.innerWidth, 1600);
     let h = sceneCanvas.height = Math.min(window.innerHeight, 1200);
     let mouseX = w / 2;
     let mouseY = h / 2;
     let animationFrameId = null;
-    let scenePaused = false;
+    let scenePaused = true;
     let lastFrameTime = 0;
     const targetFrameInterval = 1000 / 60;
     const deviceQuality = window.innerWidth < 700 ? 'mobile' : window.innerWidth < 1100 ? 'medium' : 'high';
@@ -1410,7 +1569,7 @@
     }
 
     function resumeSceneAnimation() {
-      if (!scenePaused) return;
+      if (!scenePaused && animationFrameId) return;
       scenePaused = false;
       lastFrameTime = 0;
       if (!animationFrameId) {
@@ -1497,15 +1656,19 @@
       animationFrameId = requestAnimationFrame(draw3DScene);
     }
 
-    animationFrameId = requestAnimationFrame(draw3DScene);
-
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         pauseSceneAnimation();
-      } else {
+      } else if (experienceStarted && !videoModal.classList.contains('open')) {
         resumeSceneAnimation();
       }
     });
+
+    document.body.style.overflowY = 'hidden';
+
+    enterExperience.addEventListener('click', () => {
+      resumeSceneAnimation();
+    }, { once: true });
   </script>
 </body>
 </html>
